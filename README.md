@@ -36,12 +36,22 @@ Spanish, French, German, Portuguese, Italian, Russian, Japanese, Korean, Mandari
 
 | | |
 | --- | --- |
-| **Onboarding** | Native languages, the language you learn, a CEFR self-check (can-do statements) or a manual A1–C2 pick, interests, goals, a daily practice goal. 16+ only. |
+| **Sign-up** | Clerk: email and password with a verification code, or Google. Password resets and leaked-password checks included. |
+| **Onboarding** | Your name, a 16+ confirmation, native languages, the language you learn, a CEFR self-check (can-do statements) or a manual A1–C2 pick, interests, goals, a daily practice goal. |
 | **Find a partner** | Native speakers of your target language ranked by a compatibility score: tandem fit, shared interests, level balance, goals, and +10 when they're online right now. Filters, profiles, chat requests that arrive instantly, accept / decline, block and report. |
 | **Coached chat** | Check a sentence before sending; a coach note on every message you send; partner correction cards; translate any message; tap a word for meaning, reading, example and pronunciation; save words; share vocabulary cards; HD voice messages with transcripts; replies; typing indicators; read receipts; unread counts. |
 | **AI tutor** | Café, job interview, travel, doctor, small talk or your own scene. Replies stream in, adapt to your level, correct you as you go, and "Help me reply" suggests phrases when you're stuck. |
 | **Practice rooms** | 12 group chats per language (3 level bands × 4 topics), a new AI-written prompt every day posted by the room host bot, members list with live presence. Rooms in your native languages appear so you can help learners. |
 | **Progress** | Daily goal ring, streaks, a 7-day chart, weekly and all-time stats, a vocabulary notebook, SM-2 flashcard review (keys 1–4), and a mistake log grouped by type with AI-found patterns ("You often …"). |
+
+## Accounts and sign-in
+
+Authentication is handled by **Clerk**: `/login` and `/signup` host Clerk's `<SignIn>` and `<SignUp>`
+components, themed to match the app, and `src/proxy.ts` runs `clerkMiddleware()`. On a learner's first
+request the server creates their LinguaChat profile (and Nexconn id) from the Clerk user; an account
+created before Clerk with the same verified email is linked instead. Deleting an account removes the
+Clerk user too. The Clerk application was created and its keys pulled with the Clerk CLI
+(`clerk apps create`, `clerk link`, `clerk env pull`).
 
 ## How LinguaChat uses Nexconn
 
@@ -125,8 +135,9 @@ places: around the live demo on the landing page and around the closing invitati
 ## Tech stack
 
 Next.js 16 (App Router, TypeScript strict) · Tailwind CSS 4 · Nexconn Web Chat SDK + Platform Chat API ·
+Clerk (authentication) ·
 Gemini via `@google/genai` (structured JSON output, streaming, audio understanding) · Neon Postgres +
-Drizzle ORM · Vercel (functions in `sin1`) + Vercel Blob · zod · jose + bcrypt · SWR · lucide icons ·
+Drizzle ORM · Vercel (functions in `sin1`) + Vercel Blob · zod · SWR · lucide icons ·
 Vitest + Playwright.
 
 ## Run it locally
@@ -134,14 +145,15 @@ Vitest + Playwright.
 ```bash
 npm install
 vercel link && vercel env pull .env.local --yes   # or create .env.local with the variables below
+clerk link && clerk env pull                      # Clerk keys via the Clerk CLI (npx clerk@latest)
 npm run db:migrate
 npm run dev                                       # http://localhost:3103
 ```
 
 Environment variables: `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `BLOB_READ_WRITE_TOKEN`,
 `NEXCONN_APP_KEY`, `NEXCONN_APP_SECRET`, `NEXCONN_API_BASE` (`https://api.sg-light-api.com`),
-`NEXCONN_ID_PREFIX`, `SESSION_SECRET`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL`,
-and optionally `NEXT_PUBLIC_SITE_URL`. The App Key reaches the browser only through
+`NEXCONN_ID_PREFIX`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `GEMINI_API_KEY`,
+`GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL`, and optionally `NEXT_PUBLIC_SITE_URL`. The App Key reaches the browser only through
 `/api/nexconn/token`; the secret never leaves the server.
 
 ## Testing
@@ -154,7 +166,8 @@ E2E_BASE_URL=https://linguachat-chi.vercel.app npm run e2e
 
 - **Unit** (Vitest): SM-2 scheduling, compatibility scoring, streaks, CEFR self-check, rooms, time zones.
 - **End to end** (Playwright): two browser contexts, a Hindi speaker learning English and an English
-  speaker learning Hindi, against real Neon, Nexconn and Gemini: sign-up and onboarding, matching,
+  speaker learning Hindi, against real Clerk, Neon, Nexconn and Gemini. Learners are created with the
+  Clerk Backend API and signed in with a Clerk testing token. Covers onboarding, matching,
   request and accept, real-time chat, check before sending, AI coach notes on both sides, typing and read
   receipts, a correction card, translation and word saving, HD voice with transcript, flashcard review,
   the AI tutor with streamed replies and hints, a practice room with its daily prompt, progress, and

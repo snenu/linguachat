@@ -10,9 +10,11 @@ This file is the working guide for anyone (human or agent) changing this repo. K
 
 ### First-time learner
 1. Lands on `/`, reads what LinguaChat does, taps "Create account".
-2. Signs up with name, email, password and confirms they are 16 or older.
-3. Onboarding: native language(s), the language they learn, a CEFR self-check (can-do statements)
-   or a manual A1–C2 pick, interests, goals, daily practice target, optional bio.
+2. Signs up with Clerk (`/signup`): first name, email + password with an email code, or Google.
+   The first API call creates their `users` row and Nexconn id from the Clerk user.
+3. Onboarding: display name, 16+ confirmation (required), native language(s), the language they
+   learn, a CEFR self-check (can-do statements) or a manual A1–C2 pick, interests, goals, daily
+   practice target, optional bio.
 4. Lands on Home: today's goal, streak, flashcards due, suggested partners, tutor and rooms.
 
 ### Find a partner
@@ -58,7 +60,10 @@ This file is the working guide for anyone (human or agent) changing this repo. K
 - Mistake log grouped by type with frequent tags and AI-found patterns ("You often …").
 
 ### Edge cases handled
-- Not signed in → `/login`; not onboarded → `/onboarding`; 401 from any API → sign-in.
+- Not signed in → `/login` (Clerk); not onboarded → `/onboarding`; 401 from any API → sign-in.
+- Clerk user without a profile row → created on first request; a pre-Clerk row with the same
+  verified email is linked (`lib/server/session.ts#provisionUser`). Account deletion removes the
+  Clerk user as well.
 - Nexconn token rejected (31004) → fresh token from the server and reconnect; kicked by another
   device (31010) → banner with "Reconnect here"; network drop → auto reconnect, history reload.
 - AI busy (429/503) → retries + model fallback, then a friendly message; chat keeps working.
@@ -89,7 +94,9 @@ the Platform Chat API.
 src/app/                    pages (landing, (auth), onboarding, app/*), api/* route handlers, metadata
                             files (icon.svg, favicon.ico, apple-icon.png, opengraph-image.tsx,
                             manifest.ts, robots.ts, sitemap.ts), not-found, error, global-error
-src/app/api/                auth, me, nexconn/token, partners, requests, blocks, reports, users,
+src/proxy.ts                clerkMiddleware() (Next 16 calls middleware "proxy")
+src/app/(auth)/             login/[[...rest]] and signup/[[...rest]]: Clerk <SignIn>/<SignUp>
+src/app/api/                me, nexconn/token, partners, requests, blocks, reports, users,
                             ai/{check,annotate,translate,word,voice}, corrections, vocab, mistakes,
                             progress, tutor/{sessions,turn,hint}, rooms/[id]/{join,leave,visit}
 src/components/landing/     hero demo (animated correction), reveal-on-scroll, tutor demo, flip card, header
@@ -100,7 +107,8 @@ src/components/ui/          buttons, form controls, dialog, toast, avatar, misc
 src/db/                     Drizzle schema + client          drizzle/  SQL migrations
 src/lib/nexconn/            server.ts (Platform API), client.ts (Web SDK), types.ts, model.ts
 src/lib/ai/                 gemini.ts (retry/fallback/stream), coach.ts (prompts + schemas + cache)
-src/lib/server/             env, session (JWT cookie), http, rate-limit, domain, social, tutor, rooms
+src/lib/server/             env, session (Clerk auth → users row), http, rate-limit, domain, social, tutor, rooms
+src/lib/clerk-appearance.ts Clerk component theme (airmail palette, cssLayerName "clerk")
 src/lib/                    languages, sm2, compat, streak, rooms, day, validation (shared),
                             brand (logo paths), site (public URL)
 scripts/icons.mjs           renders favicon/app icons/README logo from src/lib/brand.ts (needs sharp)
@@ -109,7 +117,7 @@ tests/e2e/                  Playwright: two-context tandem journey (real Nexconn
 ```
 
 ## Data model (Postgres)
-- `users`: auth (bcrypt), profile, languages, CEFR level, interests, goals, daily target, timezone,
+- `users`: `clerk_user_id` (Clerk owns sign-in; `password_hash` only exists on pre-Clerk rows), profile, languages, CEFR level, interests, goals, daily target, timezone,
   auto-correct preference, Nexconn id (`lgcu…`) + cached token and the App Key it was issued for,
   16+ confirmation time.
 - `chat_requests` (pending/accepted/declined/cancelled), `partnerships` (ordered pair), `blocks`, `reports`.
@@ -156,7 +164,8 @@ app.
 
 ## Environment variables (names only)
 `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `BLOB_READ_WRITE_TOKEN`, `NEXCONN_APP_KEY`,
-`NEXCONN_APP_SECRET`, `NEXCONN_API_BASE`, `NEXCONN_ID_PREFIX`, `SESSION_SECRET`, `GEMINI_API_KEY`,
+`NEXCONN_APP_SECRET`, `NEXCONN_API_BASE`, `NEXCONN_ID_PREFIX`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`,
+`CLERK_SECRET_KEY`, `GEMINI_API_KEY`,
 `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL` (`GEMINI_EMBED_MODEL` is provisioned but unused).
 The App Key reaches the browser only through `/api/nexconn/token`; the secret never leaves the server.
 
@@ -164,6 +173,7 @@ The App Key reaches the browser only through `/api/nexconn/token`; the secret ne
 ```
 npm install
 vercel env pull .env.local --yes     # env for local dev
+clerk env pull                       # Clerk keys (project linked with `clerk link`, app "LinguaChat")
 npm run dev                          # http://localhost:3103
 npm run typecheck && npm run lint && npm test
 npm run db:generate                  # after editing src/db/schema.ts
@@ -194,7 +204,8 @@ vercel deploy --prod                 # remote build, region sin1
 ## Testing
 - Unit (vitest): `npm test` (12 tests).
 - E2E (Playwright, `tests/e2e/tandem.spec.ts`): two browser contexts (Asha: Hindi → learning English,
-  Ben: English → learning Hindi) sign up and onboard, match, request/accept, chat in real time,
+  Ben: English → learning Hindi) are created via the Clerk Backend API (`+clerk_test` emails), signed
+  in with a Clerk testing token (`tests/e2e/global-setup.ts` runs `clerkSetup()`), then onboard, match, request/accept, chat in real time,
   check before sending, receive AI coach notes via metadata on both sides, typing + read receipts,
   manual correction card, translate + word lookup + save, HD voice with transcript (fake mic plays
   `tests/e2e/fixtures/voice.wav`), SM-2 review, mistake log, AI tutor with streamed replies and
