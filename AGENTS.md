@@ -32,8 +32,8 @@ This file is the working guide for anyone (human or agent) changing this repo. K
   metadata (`aic`); both people see a quiet, expandable "Coach note". Saved to the mistake log.
 - Partner correction card (custom message `LGC:Correction`): original vs corrected + note + type;
   recorded in the corrected partner's mistake log.
-- Tap a message → Reply, Translate (Gemini, into my native language), Listen (SpeechSynthesis),
-  Correct (partner's messages). Tap a word → meaning, reading, example; save to vocabulary or
+- Tap a message → react (👍 ❤️ 😂 😮 🙏, Nexconn reactions, live for both), Reply, Translate
+  (Gemini, into my native language), Listen (SpeechSynthesis), Correct (partner's messages). Tap a word → meaning, reading, example; save to vocabulary or
   share as a vocab card (`LGC:VocabCard`).
 - HD voice messages (recorded as 16 kHz WAV) → Gemini transcript (+ correction for my own voice)
   attached as metadata (`vtx`).
@@ -139,7 +139,8 @@ tests/e2e/                  Playwright: two-context tandem journey (real Nexconn
 | Custom message types `LGC:Correction`, `LGC:VocabCard`, `LGC:TutorTip`, `LGC:RoomPrompt`, `LGC:Notice` | registered in `client.ts#boot`; rendered in `chat/message-item.tsx` |
 | Status (transient) message `LGC:Signal` | request/partner refresh and stream hand-off: `lib/server/social.ts#sendSignal`, `lib/server/tutor.ts` |
 | Message metadata (send-enabled + server set + `onMessageMetadataUpdated`) | `client.ts#deliver` (`metadata`), `server.ts#setMessageMetadata`, `api/ai/annotate`, `api/ai/voice`, `api/tutor/turn` |
-| Reply / quote (`RC:ReferenceMsg`) | `client.ts#sendText`, `message-item.tsx` |
+| Reply / quote (`RC:ReferenceMsg`; `referMsg` is the original content since SDK 26.5.1) | `client.ts#sendText`, `message-item.tsx` |
+| Message reactions (`addReaction`/`removeReaction`, `getMessageReactionSummaries`, `onMessageReactionChanged`) | `client.ts#react/reactionSummaries`, `chat/use-reactions.ts`, chips + quick-react row in `message-item.tsx` |
 | HD voice (`RC:HQVCMsg`, media upload) | `client.ts#sendVoice`, `lib/client/recorder.ts` |
 | Streaming messages (`RC:StreamMsg` server send + `requestStreamMessage` + delta events) | `server.ts#streamDirectChunk`, `lib/server/tutor.ts`, `client.ts#requestStream/fetchById` |
 | Server-sent bot/system messages | tutor bot, room host bot, accept notice (`api/requests/[id]`) |

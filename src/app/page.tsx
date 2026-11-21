@@ -57,11 +57,11 @@ const NEXCONN = [
   { name: "Streaming messages", body: "Tutor replies arrive word by word as they are written." },
   { name: "Custom message types", body: "Correction cards, vocabulary cards, tutor tips and daily room prompts." },
   { name: "Online presence", body: "Who is online now, in partner lists, chats and rooms." },
-  { name: "Read receipts and typing", body: "A quiet “Read” under your message and “Sam is typing”." },
+  { name: "Receipts, typing and unread", body: "A quiet “Read”, “Sam is typing”, unread badges and older messages as you scroll." },
   { name: "HD voice messages", body: "Voice notes upload through the SDK, then the coach transcribes them." },
   { name: "Status messages", body: "Chat requests and accepts arrive instantly without filling your history." },
   { name: "User blocklist", body: "Blocking someone stops their messages at the network, not just in the app." },
-  { name: "Unread counts and history", body: "Badges, the chat list and older messages as you scroll up." },
+  { name: "Message reactions", body: "React to any message with an emoji; your partner sees it appear instantly." },
   { name: "Server-sent bot messages", body: "The tutor and room host post through the Platform Chat API." },
 ];
 

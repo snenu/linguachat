@@ -23,7 +23,8 @@ import { api, errorMessage } from "@/lib/client/api";
 import { speak } from "@/lib/client/speech";
 import { segmentWords } from "@/lib/client/speech";
 import { MISTAKE_LABELS, type MistakeCategory } from "@/lib/languages";
-import type { ChatMessage } from "@/lib/nexconn/model";
+import type { ChatMessage, Reaction } from "@/lib/nexconn/model";
+import { QUICK_REACTIONS } from "./use-reactions";
 import {
   META,
   MSG,
@@ -45,6 +46,8 @@ export interface MessageActions {
   onRetry?: (m: ChatMessage) => void;
   onDiscard?: (m: ChatMessage) => void;
   onTranscribe?: (m: ChatMessage) => void;
+  /** Toggle my reaction (Nexconn message reactions). */
+  onReact?: (messageId: string, reactionId: string) => void;
 }
 
 function parseMeta<T>(m: ChatMessage, key: string): T | null {
@@ -244,6 +247,7 @@ export function MessageItem({
   actions,
   canCorrect,
   coachChecking,
+  reactions = [],
 }: {
   m: ChatMessage;
   text: string;
@@ -258,6 +262,7 @@ export function MessageItem({
   actions: MessageActions;
   canCorrect: boolean;
   coachChecking: boolean;
+  reactions?: Reaction[];
 }) {
   const [selected, setSelected] = useState(false);
   const [translation, setTranslation] = useState<string | null>(null);
@@ -518,6 +523,28 @@ export function MessageItem({
           {body}
         </div>
 
+        {reactions.length > 0 && m.id && (
+          <div className={`relative z-[1] -mt-1.5 flex flex-wrap gap-1 px-1.5 ${out ? "justify-end" : "justify-start"}`}>
+            {[...reactions]
+              .sort((a, b) => b.count - a.count)
+              .map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => actions.onReact?.(m.id!, r.id)}
+                  aria-pressed={r.mine}
+                  aria-label={`${r.id} ${r.count}${r.mine ? ", including you" : ""}`}
+                  className={`animate-pop-in inline-flex h-6 items-center gap-1 rounded-full border px-1.5 text-xs shadow-sm transition-[background-color,border-color,transform] active:scale-90 ${
+                    r.mine ? "border-accent-line bg-accent-wash font-semibold text-accent-ink" : "border-line bg-surface text-ink-2 hover:border-line-strong"
+                  }`}
+                >
+                  <span aria-hidden="true">{r.id}</span>
+                  <span className="tabular-nums">{r.count}</span>
+                </button>
+              ))}
+          </div>
+        )}
+
         {voice && (
           <div className="animate-ink-in mt-1.5 w-[min(24rem,100%)] rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm shadow-sm">
             <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-3">
@@ -569,6 +596,26 @@ export function MessageItem({
             role="toolbar"
             aria-label="Message actions"
           >
+            {m.id && actions.onReact && (
+              <span className="flex items-center gap-0.5 border-r border-line pr-1" role="group" aria-label="React">
+                {QUICK_REACTIONS.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    onClick={() => {
+                      actions.onReact?.(m.id!, emoji);
+                      setSelected(false);
+                    }}
+                    aria-label={`React ${emoji}`}
+                    className={`flex h-8 w-8 items-center justify-center rounded-full text-base transition-[background-color,transform] hover:scale-110 hover:bg-wash active:scale-90 ${
+                      reactions.some((r) => r.id === emoji && r.mine) ? "bg-accent-wash" : ""
+                    }`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </span>
+            )}
             <ActionBtn icon={<Reply size={14} />} label="Reply" onClick={() => actions.onReply(m)} />
             <ActionBtn icon={translating ? <Spinner size={13} /> : <Languages size={14} />} label={translation ? "Hide translation" : "Translate"} onClick={translate} />
             <ActionBtn icon={<Volume2 size={14} />} label="Listen" onClick={() => speak(text, lang)} />

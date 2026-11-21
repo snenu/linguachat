@@ -16,6 +16,7 @@ import { MSG, type CorrectionCardContent, type VocabCardContent } from "@/lib/ne
 import { Composer } from "./composer";
 import { CorrectionDialog, type CorrectionDraft } from "./correction-dialog";
 import { MessageItem } from "./message-item";
+import { useReactions } from "./use-reactions";
 import { streamsText, useThread } from "./use-thread";
 import { WordDialog } from "./word-dialog";
 
@@ -59,6 +60,7 @@ export function Thread({
   const { state } = useChat();
   const toast = useToast();
   const t = useThread(channel);
+  const { reactions, toggle: toggleReaction } = useReactions(channel, t.messages);
   const [draft, setDraft] = useState("");
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [word, setWord] = useState<{ word: string; sentence: string } | null>(null);
@@ -340,7 +342,9 @@ export function Thread({
                     lang={guessLang(streamsText(m, t.streams), [me.targetLanguage, ...me.nativeLanguages])}
                     canCorrect={mode === "partner"}
                     coachChecking={!!m.id && checkingIds.has(m.id)}
+                    reactions={m.id ? reactions[m.id] : undefined}
                     actions={{
+                      onReact: (id, emoji) => void toggleReaction(id, emoji),
                       onReply: (msg) => setReplyTo(msg),
                       onWord: (w, sentence) => setWord({ word: w, sentence }),
                       onCorrect: mode === "partner" ? (msg, text) => setCorrecting({ m: msg, text }) : undefined,

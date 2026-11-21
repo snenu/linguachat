@@ -2,7 +2,7 @@
 
 import type * as NC from "@nexconn/chat";
 import { MSG } from "./types";
-import { channelKey, type ChannelRef, type ChannelSummary, type ChatMessage, type ConnectionState, type NcEvent } from "./model";
+import { channelKey, type ChannelRef, type ChannelSummary, type ChatMessage, type ConnectionState, type NcEvent, type Reaction, type ReactionChange } from "./model";
 
 type Sdk = typeof NC;
 type RawMessage = NC.Message<Record<string, unknown>>;
@@ -165,6 +165,16 @@ class NexconnClient {
         onMessageDeleted: ({ messages }) => {
           this.emit({ type: "deleted", messageIds: messages.map((m) => m.messageId) });
         },
+        onMessageReactionChanged: ({ reactions }) => {
+          const changes: ReactionChange[] = [];
+          for (const r of reactions) {
+            const channel = this.refFromIdentifier(r.channelIdentifier);
+            if (!channel) continue;
+            const op = r.operationType === sdk.MessageReactionOperationType.ADDED ? "added" : r.operationType === sdk.MessageReactionOperationType.REMOVED ? "removed" : "cleared";
+            changes.push({ channel, messageId: r.messageId, reactionId: r.reactionId, op, userIds: r.users.map((u) => u.userId), total: r.totalCount });
+          }
+          if (changes.length) this.emit({ type: "reactions", changes });
+        },
         onStreamMessageRequestDelta: ({ messageId, chunkInfo }) => {
           this.emit({ type: "stream", messageId, text: chunkInfo.messageContent, done: false });
         },
@@ -307,6 +317,7 @@ class NexconnClient {
       metadata,
       state,
       read: false,
+      hasReactions: !!m.hasReactions,
     };
   }
 
@@ -336,7 +347,8 @@ class NexconnClient {
         referMsgId: opts.replyTo.id,
         referMsgType: opts.replyTo.type,
         referMsgSenderId: opts.replyTo.senderId,
-        referMsg: { content: opts.replySnippet ?? "" },
+        // Since SDK 26.5.1 the quoted snapshot is the original message's own content object.
+        referMsg: { ...opts.replyTo.content },
         extra: JSON.stringify({ q: (opts.replySnippet ?? "").slice(0, 160) }),
       });
       return this.deliver(ref, params as unknown as NC.SendMessageParams<Record<string, unknown>>, opts.onLocal);
@@ -445,6 +457,28 @@ class NexconnClient {
       }
       await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
     }
+  }
+
+  // ---- reactions ----------------------------------------------------------------------------
+
+  /** Reaction summaries for up to 100 messages of one channel, keyed by message id. */
+  async reactionSummaries(ref: ChannelRef, messageIds: string[]): Promise<Record<string, Reaction[]>> {
+    if (!this.sdk || this.state !== "connected" || messageIds.length === 0) return {};
+    const res = await this.channel(ref).getMessageReactionSummaries(messageIds.slice(-100)).catch(() => null);
+    if (!res || res.code !== 0 || !res.data) return {};
+    const out: Record<string, Reaction[]> = {};
+    for (const [id, list] of Object.entries(res.data)) {
+      out[id] = list.map((r) => ({ id: r.reactionId, count: r.totalCount, mine: r.hasCurrentUserReacted }));
+    }
+    return out;
+  }
+
+  /** Adds or removes my reaction on a sent message. */
+  async react(messageId: string, reactionId: string, add: boolean) {
+    const m = this.raw.get(messageId);
+    if (!m) throw new Error("This message isn't loaded yet");
+    const res = add ? await m.addReaction({ reactionId }) : await m.removeReaction({ reactionId });
+    if (res.code !== 0) throw Object.assign(new Error(`Reaction not saved (${res.code})`), { code: res.code });
   }
 
   async requestStream(messageId: string) {

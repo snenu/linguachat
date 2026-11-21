@@ -25,7 +25,26 @@ export interface ChatMessage {
   metadata: Record<string, string>;
   state: SendState;
   read: boolean;
+  /** The server has reactions recorded for this message (load summaries to show them). */
+  hasReactions?: boolean;
   error?: string;
+}
+
+/** One emoji on a message: how many people added it and whether I did. */
+export interface Reaction {
+  id: string;
+  count: number;
+  mine: boolean;
+}
+
+export interface ReactionChange {
+  channel: ChannelRef;
+  messageId: string;
+  /** Empty when every reaction on the message was cleared. */
+  reactionId: string;
+  op: "added" | "removed" | "cleared";
+  userIds: string[];
+  total: number;
 }
 
 export interface ChannelSummary {
@@ -47,6 +66,7 @@ export type NcEvent =
   | { type: "presence"; online: Record<string, boolean> }
   | { type: "stream"; messageId: string; text: string; done: boolean }
   | { type: "deleted"; messageIds: string[] }
+  | { type: "reactions"; changes: ReactionChange[] }
   | { type: "signal"; kind: string; from: string }
   | { type: "unread"; total: number };
 

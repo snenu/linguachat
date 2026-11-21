@@ -39,7 +39,7 @@ Spanish, French, German, Portuguese, Italian, Russian, Japanese, Korean, Mandari
 | **Sign-up** | Clerk: email and password with a verification code, or Google. Password resets and leaked-password checks included. |
 | **Onboarding** | Your name, a 16+ confirmation, native languages, the language you learn, a CEFR self-check (can-do statements) or a manual A1–C2 pick, interests, goals, a daily practice goal. |
 | **Find a partner** | Native speakers of your target language ranked by a compatibility score: tandem fit, shared interests, level balance, goals, and +10 when they're online right now. Filters, profiles, chat requests that arrive instantly, accept / decline, block and report. |
-| **Coached chat** | Check a sentence before sending; a coach note on every message you send; partner correction cards; translate any message; tap a word for meaning, reading, example and pronunciation; save words; share vocabulary cards; HD voice messages with transcripts; replies; typing indicators; read receipts; unread counts. |
+| **Coached chat** | Check a sentence before sending; a coach note on every message you send; partner correction cards; translate any message; tap a word for meaning, reading, example and pronunciation; save words; share vocabulary cards; HD voice messages with transcripts; replies; emoji reactions; typing indicators; read receipts; unread counts. |
 | **AI tutor** | Café, job interview, travel, doctor, small talk or your own scene. Replies stream in, adapt to your level, correct you as you go, and "Help me reply" suggests phrases when you're stuck. |
 | **Practice rooms** | 12 group chats per language (3 level bands × 4 topics), a new AI-written prompt every day posted by the room host bot, members list with live presence. Rooms in your native languages appear so you can help learners. |
 | **Progress** | Daily goal ring, streaks, a 7-day chart, weekly and all-time stats, a vocabulary notebook, SM-2 flashcard review (keys 1–4), and a mistake log grouped by type with AI-found patterns ("You often …"). |
@@ -55,7 +55,7 @@ Clerk user too. The Clerk application was created and its keys pulled with the C
 
 ## How LinguaChat uses Nexconn
 
-LinguaChat is built directly on the **Nexconn Web Chat SDK** (`@nexconn/chat`, with our own UI) in the
+LinguaChat is built directly on the **Nexconn Web Chat SDK** (`@nexconn/chat` 26.5.1, with our own UI) in the
 browser and the **Nexconn Platform Chat API** on the server, in the Singapore data center. There are no
 console webhooks: after an SDK action the browser calls our API, and the server verifies membership or
 partnership before acting through the Platform Chat API.
@@ -82,7 +82,8 @@ flowchart LR
 | **Message metadata** | Messages are sent with metadata enabled; the server attaches the AI correction (`aic`) and voice transcript (`vtx`) and both people see the note appear live via `onMessageMetadataUpdated`. | `client.ts#deliver`, `server.ts#setMessageMetadata`, `api/ai/annotate`, `api/ai/voice` |
 | **Streaming messages** | The tutor bot's replies are sent as `RC:StreamMsg` chunks from the server; the client requests the stream and renders it as it grows. | `server.ts#streamDirectChunk`, `lib/server/tutor.ts`, `client.ts#requestStream` |
 | **HD voice messages** | Recorded in the browser as 16 kHz WAV and sent as `RC:HQVCMsg` through the SDK's media upload. | `client.ts#sendVoice`, `lib/client/recorder.ts` |
-| Reply / quote | `RC:ReferenceMsg` replies with a quoted snippet. | `client.ts#sendText` |
+| Reply / quote | `RC:ReferenceMsg` replies quoting the original message's content (SDK 26.5.1 format). | `client.ts#sendText` |
+| **Message reactions** | 👍 ❤️ 😂 😮 🙏 on any message in chats and rooms; summaries load with history and other people's reactions arrive live through `onMessageReactionChanged`. | `client.ts#react/reactionSummaries`, `chat/use-reactions.ts` |
 | Server-sent bot messages | The tutor bot, the room host bot (daily prompts) and the "you're now partners" notice post through the Platform Chat API. | `lib/server/tutor.ts`, `lib/server/rooms.ts`, `api/requests/[id]` |
 | Read receipts | "Read" under your last read message in direct chats. | `client.ts#markRead/readState` |
 | Typing indicators | "Sam is typing…" in direct chats. | `client.ts#sendTyping` |

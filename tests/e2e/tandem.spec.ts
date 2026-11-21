@@ -124,6 +124,14 @@ test("Asha translates Ben's message and saves a word to her vocabulary", async (
   await expect(dialog.getByRole("button", { name: "Saved to flashcards" })).toBeVisible();
   await shot(A, "word-lookup");
   await A.keyboard.press("Escape");
+
+  // Nexconn message reactions: Asha reacts, Ben sees it arrive live.
+  const column = A.locator("div", { has: bubble(A, "music on weekends") }).last();
+  const react = column.getByRole("button", { name: "React 👍" });
+  if (!(await react.isVisible())) await bubble(A, "music on weekends").click();
+  await react.click();
+  await expect(A.getByRole("button", { name: "👍 1, including you" })).toBeVisible();
+  await expect(B.getByRole("button", { name: "👍 1", exact: true })).toBeVisible();
 });
 
 test("Asha sends an HD voice message; it is transcribed and corrected", async () => {
