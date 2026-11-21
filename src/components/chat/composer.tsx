@@ -1,6 +1,6 @@
 "use client";
 
-import { Mic, Send, SpellCheck, Square, Trash2, X } from "lucide-react";
+import { Check, Mic, PenLine, Reply, SendHorizontal, SpellCheck, Square, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Button, IconButton } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -134,31 +134,45 @@ export function Composer({
   }
 
   return (
-    <div className="border-t border-line bg-surface px-3 pt-2 pb-3 sm:px-4">
+    <div className="border-t border-line bg-surface px-3 pt-2.5 pb-3 sm:px-4">
       {check && (
-        <div className="animate-ink-in mb-2 rounded-lg border border-accent/30 bg-accent-wash p-3" role="status" aria-live="polite">
+        <div
+          className={`animate-pop-in mb-2.5 rounded-xl border p-3.5 shadow-sm ${check.result.ok ? "border-mint/30 bg-mint-wash" : "border-accent-line bg-accent-wash"}`}
+          role="status"
+          aria-live="polite"
+        >
           <div className="flex items-start justify-between gap-2">
-            <p className="text-xs font-semibold text-ink-2">{check.result.ok ? "Coach check" : "Suggested correction"}</p>
-            <button type="button" onClick={() => setCheck(null)} aria-label="Dismiss check" className="text-ink-3 hover:text-ink">
+            <p className={`flex items-center gap-1.5 text-xs font-semibold ${check.result.ok ? "text-mint" : "text-accent-ink"}`}>
+              {check.result.ok ? <Check size={14} strokeWidth={3} aria-hidden="true" /> : <PenLine size={13} aria-hidden="true" />}
+              {check.result.ok ? "Coach check" : "Suggested correction"}
+            </p>
+            <button type="button" onClick={() => setCheck(null)} aria-label="Dismiss check" className="-m-1 rounded-full p-1 text-ink-3 hover:bg-surface hover:text-ink">
               <X size={15} />
             </button>
           </div>
           {check.result.ok ? (
-            <p className="mt-1 text-ink">{check.result.inTargetLanguage ? "Looks natural. Send it!" : "This doesn't look like the language you're learning, so there's nothing to correct."}</p>
+            <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-ink">
+                {check.result.inTargetLanguage ? "Looks natural. Send it!" : "This doesn't look like the language you're learning, so there's nothing to correct."}
+              </p>
+              <Button size="sm" onClick={() => send(check.text)} icon={<SendHorizontal size={14} />}>
+                Send
+              </Button>
+            </div>
           ) : (
             <>
-              <div className="mt-1 text-ink">
+              <div className="mt-1.5 text-[0.97rem] text-ink">
                 <CorrectionDiff original={check.text} corrected={check.result.corrected} />
               </div>
-              {check.result.explanation && <p className="mt-1 text-sm text-ink-2">{check.result.explanation}</p>}
-              <div className="mt-2.5 flex flex-wrap gap-2">
+              {check.result.explanation && <p className="mt-1.5 text-sm text-ink-2">{check.result.explanation}</p>}
+              <div className="mt-3 flex flex-wrap gap-2">
                 <Button size="sm" onClick={() => send(check.result.corrected)}>
                   Send corrected
                 </Button>
                 <Button size="sm" variant="secondary" onClick={() => (setDraft(check.result.corrected), setCheck(null))}>
                   Edit corrected
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => send(check.text)}>
+                <Button size="sm" variant="quiet" onClick={() => send(check.text)}>
                   Send mine
                 </Button>
               </div>
@@ -168,67 +182,91 @@ export function Composer({
       )}
 
       {replyTo && (
-        <div className="mb-2 flex items-center justify-between gap-2 rounded-md border-l-2 border-accent bg-paper px-3 py-1.5 text-sm">
-          <span className="min-w-0 truncate text-ink-2">
-            Replying to: <span className="text-ink">{replyText || "message"}</span>
+        <div className="animate-ink-in mb-2 flex items-center justify-between gap-2 rounded-lg border-l-[3px] border-accent bg-accent-wash px-3 py-2 text-sm">
+          <span className="flex min-w-0 items-center gap-2">
+            <Reply size={14} className="shrink-0 text-accent" aria-hidden="true" />
+            <span className="min-w-0 truncate text-ink-2">
+              Replying to: <span className="text-ink">{replyText || "message"}</span>
+            </span>
           </span>
-          <button type="button" onClick={onCancelReply} aria-label="Cancel reply" className="text-ink-3 hover:text-ink">
+          <button type="button" onClick={onCancelReply} aria-label="Cancel reply" className="rounded-full p-1 text-ink-3 hover:bg-surface hover:text-ink">
             <X size={15} />
           </button>
         </div>
       )}
 
       {recording ? (
-        <div className="flex h-12 items-center gap-3" role="status">
-          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-accent" aria-hidden="true" />
+        <div className="animate-ink-in flex h-12 items-center gap-3 rounded-full border border-red/30 bg-red-wash pr-1.5 pl-4" role="status">
+          <span className="h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-red" aria-hidden="true" />
           <span className="font-semibold text-ink tabular-nums">
             Recording {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")}
           </span>
-          <span className="text-sm text-ink-3">up to 60 seconds</span>
-          <div className="ml-auto flex gap-2">
-            <IconButton label="Discard recording" onClick={cancelRecording}>
-              <Trash2 size={18} />
+          <span className="hidden h-5 items-center gap-[3px] sm:flex" aria-hidden="true">
+            {[8, 14, 10, 18, 12, 16, 9, 13, 7, 15].map((h, i) => (
+              <span key={i} className="w-[3px] animate-pulse rounded-full bg-red/70" style={{ height: h, animationDelay: `${i * 90}ms` }} />
+            ))}
+          </span>
+          <span className="hidden text-xs text-ink-3 md:inline">up to 60 seconds</span>
+          <div className="ml-auto flex items-center gap-1.5">
+            <IconButton label="Discard recording" onClick={cancelRecording} className="rounded-full hover:bg-surface">
+              <Trash2 size={17} />
             </IconButton>
-            <Button onClick={stopRecording} icon={<Square size={14} fill="currentColor" />}>
+            <Button onClick={stopRecording} icon={<Square size={12} fill="currentColor" />} className="rounded-full">
               Send voice
             </Button>
           </div>
         </div>
       ) : (
-        <div className="flex items-end gap-1.5">
-          <label htmlFor="composer" className="sr-only">
-            Message
-          </label>
-          <textarea
-            id="composer"
-            ref={inputRef}
-            rows={1}
-            value={draft}
-            disabled={disabled}
-            placeholder={placeholder}
-            onChange={(e) => {
-              setDraft(e.target.value);
-              if (check) setCheck(null);
-              const now = Date.now();
-              if (onTyping && now - lastTyping.current > 3000) {
-                lastTyping.current = now;
-                onTyping();
-              }
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
-                e.preventDefault();
-                send();
-              }
-            }}
-            className="max-h-40 min-h-11 flex-1 resize-none rounded-md border border-line-strong bg-paper px-3 py-2.5 text-base text-ink placeholder:text-ink-3 focus:border-accent focus:outline-none disabled:opacity-60"
-          />
-          <IconButton label="Check before sending" onClick={runCheck} disabled={!draft.trim() || checking || disabled} className="h-11 w-11">
-            {checking ? <Spinner size={18} /> : <SpellCheck size={19} />}
-          </IconButton>
+        <div className="flex items-end gap-2">
+          <div
+            className={`flex min-w-0 flex-1 items-end rounded-[1.4rem] border bg-paper pr-1 pl-4 transition-[border-color,box-shadow] focus-within:border-accent focus-within:bg-surface focus-within:ring-4 focus-within:ring-accent/15 ${
+              disabled ? "border-line opacity-70" : "border-line-strong hover:border-ink-3"
+            }`}
+          >
+            <label htmlFor="composer" className="sr-only">
+              Message
+            </label>
+            <textarea
+              id="composer"
+              ref={inputRef}
+              rows={1}
+              value={draft}
+              disabled={disabled}
+              placeholder={placeholder}
+              onChange={(e) => {
+                setDraft(e.target.value);
+                if (check) setCheck(null);
+                const now = Date.now();
+                if (onTyping && now - lastTyping.current > 3000) {
+                  lastTyping.current = now;
+                  onTyping();
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                  e.preventDefault();
+                  send();
+                }
+              }}
+              className="max-h-40 min-h-11 flex-1 resize-none bg-transparent py-2.5 text-base text-ink placeholder:text-ink-3 focus:outline-none disabled:cursor-not-allowed"
+            />
+            <IconButton
+              label="Check before sending"
+              onClick={runCheck}
+              disabled={!draft.trim() || checking || disabled}
+              className={`mb-1 h-9 w-9 rounded-full ${draft.trim() && !checking ? "text-accent hover:bg-accent-wash hover:text-accent-ink" : ""}`}
+            >
+              {checking ? <Spinner size={17} /> : <SpellCheck size={18} />}
+            </IconButton>
+          </div>
           {allowVoice && onSendVoice && (
-            <IconButton label="Record voice message" onClick={startRecording} disabled={disabled} className="h-11 w-11">
-              <Mic size={19} />
+            <IconButton
+              label="Record voice message"
+              onClick={startRecording}
+              disabled={disabled}
+              className="h-11 w-11 rounded-full border border-line-strong bg-surface hover:border-ink-3"
+            >
+              <Mic size={18} />
             </IconButton>
           )}
           <button
@@ -236,13 +274,13 @@ export function Composer({
             onClick={() => send()}
             disabled={!draft.trim() || disabled}
             aria-label="Send message"
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-accent text-surface transition-colors hover:bg-accent-ink disabled:opacity-40"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-sm transition-[background-color,transform,opacity] hover:bg-accent-ink active:scale-90 disabled:bg-accent/35 disabled:shadow-none"
           >
-            <Send size={18} />
+            <SendHorizontal size={18} />
           </button>
         </div>
       )}
-      {extra && !recording && <div className="mt-2 flex flex-wrap items-center gap-2">{extra}</div>}
+      {extra && !recording && <div className="mt-2.5 flex flex-wrap items-center gap-2">{extra}</div>}
     </div>
   );
 }
