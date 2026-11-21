@@ -435,7 +435,7 @@ export default async function Landing() {
                 as="li"
                 key={l.code}
                 delay={(i % 4) * 60}
-                className="group flex items-baseline justify-between gap-2 rounded-lg border border-line bg-surface px-4 py-3.5 transition-[border-color,box-shadow] hover:border-accent-line hover:shadow-md"
+                className="group flex flex-col gap-0.5 rounded-lg border border-line bg-surface px-4 py-3.5 transition-[border-color,box-shadow] hover:border-accent-line hover:shadow-md sm:flex-row sm:items-baseline sm:justify-between sm:gap-2"
               >
                 <span lang={l.code} dir={l.rtl ? "rtl" : undefined} className="font-display text-xl font-bold text-ink">
                   {l.native}
