@@ -3,8 +3,11 @@ import { db, schema } from "@/db";
 import { parseRoomId } from "@/lib/rooms";
 import { blockedIds } from "@/lib/server/domain";
 import { handler, HttpError, json } from "@/lib/server/http";
-import { utcDay } from "@/lib/server/rooms";
+import { env } from "@/lib/server/env";
+import { ensureRoom, utcDay } from "@/lib/server/rooms";
 import { requireOnboardedUser } from "@/lib/server/session";
+
+export const maxDuration = 30;
 
 export const GET = handler(async (_req: Request, ctx: { params: Promise<{ id: string }> }) => {
   const me = await requireOnboardedUser();
@@ -39,10 +42,13 @@ export const GET = handler(async (_req: Request, ctx: { params: Promise<{ id: st
       .limit(1),
     blockedIds(me.id),
   ]);
+  const joined = members.some((m) => m.id === me.id);
+  // The group lives in a previous Nexconn app: create it again (with members) before chatting.
+  if (joined && room.nexconnAppKey !== env.nexconnAppKey) await ensureRoom(def);
   return json({
     room: def,
     groupId: room.groupId,
-    joined: members.some((m) => m.id === me.id),
+    joined,
     members: members.map((m) => ({ ...m, blocked: blocked.has(m.id) })),
     prompt: prompt?.prompt ? { prompt: prompt.prompt, hint: prompt.hint, day: prompt.day } : null,
   });

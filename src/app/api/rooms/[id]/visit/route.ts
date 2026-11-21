@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { parseRoomId } from "@/lib/rooms";
 import { handler, HttpError, json } from "@/lib/server/http";
-import { ensureDailyPrompt } from "@/lib/server/rooms";
+import { ensureDailyPrompt, ensureRoom } from "@/lib/server/rooms";
 import { requireOnboardedUser } from "@/lib/server/session";
 
 export const maxDuration = 30;
@@ -20,6 +20,8 @@ export const POST = handler(async (_req: Request, ctx: { params: Promise<{ id: s
     .where(and(eq(schema.rooms.id, def.id), eq(schema.roomMembers.userId, me.id)))
     .limit(1);
   if (!row) throw new HttpError(403, "Join the room first", "forbidden");
-  const prompt = await ensureDailyPrompt(row.room, def);
+  // Re-provisions the group (with its members) if it belongs to a previous Nexconn app.
+  const room = (await ensureRoom(def)) ?? row.room;
+  const prompt = await ensureDailyPrompt(room, def);
   return json({ prompt: prompt?.prompt ? { prompt: prompt.prompt, hint: prompt.hint, day: prompt.day } : null });
 });

@@ -28,6 +28,8 @@ export const users = pgTable(
     displayName: text("display_name").notNull(),
     nexconnId: text("nexconn_id").notNull(),
     nexconnToken: text("nexconn_token"),
+    /** App Key the token was issued for; a different key means the Nexconn app changed. */
+    nexconnAppKey: text("nexconn_app_key"),
     avatarUrl: text("avatar_url"),
     bio: text("bio").notNull().default(""),
     nativeLanguages: text("native_languages").array().notNull().default(sql`'{}'::text[]`),
@@ -233,6 +235,8 @@ export const rooms = pgTable(
     band: text("band").notNull(),
     topic: text("topic").notNull(),
     name: text("name").notNull(),
+    /** App Key the Nexconn group was created in (re-provisioned when the app changes). */
+    nexconnAppKey: text("nexconn_app_key"),
     createdAt: createdAt(),
   },
   (t) => [uniqueIndex("rooms_group_idx").on(t.groupId)],

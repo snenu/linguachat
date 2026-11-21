@@ -2,18 +2,27 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { generateRoomPrompt } from "@/lib/ai/coach";
-import { createGroup, sendGroup } from "@/lib/nexconn/server";
+import { createGroup, joinGroup, NexconnError, sendGroup } from "@/lib/nexconn/server";
 import { MSG, type RoomPromptContent } from "@/lib/nexconn/types";
 import type { RoomDef } from "@/lib/rooms";
 import { ensureRoomHostBot } from "./domain";
+import { env } from "./env";
 import { roomGroupId } from "./ids";
 
-/** Creates the room's Nexconn group (owned by the room host bot) the first time anyone joins. */
-export async function ensureRoom(def: RoomDef) {
+/** Nexconn: "Group channel ID does not exist". */
+export const GROUP_MISSING = 25410;
+
+/**
+ * Creates the room's Nexconn group (owned by the room host bot) the first time anyone joins.
+ * If the group was created in a different Nexconn app (App Key switched) or has gone missing
+ * (`force`), it is created again and the members we know about are added back.
+ */
+export async function ensureRoom(def: RoomDef, { force = false } = {}) {
+  const appKey = env.nexconnAppKey;
   const [existing] = await db.select().from(schema.rooms).where(eq(schema.rooms.id, def.id)).limit(1);
-  if (existing) return existing;
+  if (existing && existing.nexconnAppKey === appKey && !force) return existing;
   const host = await ensureRoomHostBot();
-  const groupId = roomGroupId(def.id);
+  const groupId = existing?.groupId ?? roomGroupId(def.id);
   try {
     await createGroup({
       groupId,
@@ -22,15 +31,41 @@ export async function ensureRoom(def: RoomDef) {
       introduction: `Practice ${def.topicName.toLowerCase()} conversations with other ${def.bandLabel} learners.`,
     });
   } catch (err) {
-    // A concurrent join may have created it already; joining below will confirm it exists.
+    // A concurrent join may have created it already; joining afterwards confirms it exists.
     console.warn("[rooms] create group", err instanceof Error ? err.message : err);
+  }
+  if (existing) {
+    const members = await db
+      .select({ nexconnId: schema.users.nexconnId })
+      .from(schema.roomMembers)
+      .innerJoin(schema.users, eq(schema.users.id, schema.roomMembers.userId))
+      .where(eq(schema.roomMembers.roomId, existing.id));
+    for (let i = 0; i < members.length; i += 500) {
+      await joinGroup(groupId, members.slice(i, i + 500).map((m) => m.nexconnId));
+    }
+    const [row] = await db.update(schema.rooms).set({ nexconnAppKey: appKey }).where(eq(schema.rooms.id, existing.id)).returning();
+    return row;
   }
   const [row] = await db
     .insert(schema.rooms)
-    .values({ id: def.id, groupId, language: def.language, band: def.band, topic: def.topic, name: def.name })
+    .values({ id: def.id, groupId, language: def.language, band: def.band, topic: def.topic, name: def.name, nexconnAppKey: appKey })
     .onConflictDoNothing()
     .returning();
   return row ?? (await db.select().from(schema.rooms).where(eq(schema.rooms.id, def.id)).limit(1))[0];
+}
+
+/** Adds a learner to the room's group, re-provisioning the group once if Nexconn doesn't know it. */
+export async function joinRoom(def: RoomDef, nexconnId: string) {
+  let room = await ensureRoom(def);
+  if (!room) return null;
+  try {
+    await joinGroup(room.groupId, [nexconnId]);
+  } catch (err) {
+    if (!(err instanceof NexconnError) || Number(err.code) !== GROUP_MISSING) throw err;
+    room = await ensureRoom(def, { force: true });
+    await joinGroup(room.groupId, [nexconnId]);
+  }
+  return room;
 }
 
 export function utcDay(): string {
