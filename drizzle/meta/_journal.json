@@ -15,6 +15,13 @@
       "when": 1795270142243,
       "tag": "0001_nexconn_app_key",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795273204550,
+      "tag": "0002_clerk_auth",
+      "breakpoints": true
     }
   ]
 }

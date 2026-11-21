@@ -1,13 +1,13 @@
 "use client";
 
+import { useClerk } from "@clerk/nextjs";
 import { ChartNoAxesColumn, Flame, GraduationCap, House, LogOut, MessagesSquare, Settings, Users, UsersRound, WifiOff } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import useSWR from "swr";
 import { Avatar } from "@/components/ui/avatar";
 import { Logo } from "@/components/ui/logo";
-import { api } from "@/lib/client/api";
 import type { Progress } from "@/lib/client/types";
 import { languageName } from "@/lib/languages";
 import { nexconn } from "@/lib/nexconn/client";
@@ -90,7 +90,7 @@ function TodayCard() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
+  const { signOut } = useClerk();
   const { me } = useMe();
   const { totalUnread, state } = useChat();
   const { data: requests } = useSWR<{ incoming: unknown[] }>("/api/requests", { refreshInterval: 60_000 });
@@ -102,9 +102,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   async function logout() {
     await nexconn().disconnect();
-    await api("/api/auth/logout", { method: "POST" }).catch(() => undefined);
-    router.replace("/");
-    router.refresh();
+    await signOut({ redirectUrl: "/" });
   }
 
   return (

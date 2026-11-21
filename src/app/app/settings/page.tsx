@@ -1,7 +1,7 @@
 "use client";
 
 import { Camera, Check, Languages, LogOut, ShieldOff, SlidersHorizontal, Sparkles, Trash2, UserRound } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
 import { useRef, useState, type ReactNode } from "react";
 import useSWR from "swr";
 import { useMe } from "@/components/app/providers";
@@ -43,7 +43,7 @@ function Section({ id, title, description, children, tone = "default" }: { id: s
 export default function SettingsPage() {
   const { me, refresh } = useMe();
   const toast = useToast();
-  const router = useRouter();
+  const { signOut } = useClerk();
   const [name, setName] = useState(me.name);
   const [bio, setBio] = useState(me.bio);
   const [native, setNative] = useState<string[]>(me.nativeLanguages);
@@ -123,8 +123,7 @@ export default function SettingsPage() {
     try {
       await api("/api/me", { method: "DELETE", body: { confirm: "DELETE" } });
       await nexconn().disconnect();
-      router.replace("/");
-      router.refresh();
+      await signOut({ redirectUrl: "/" });
     } catch (err) {
       toast(errorMessage(err), "error");
     }
@@ -184,7 +183,7 @@ export default function SettingsPage() {
                   <Field label="Name" htmlFor="name">
                     <Input id="name" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} />
                   </Field>
-                  <Field label="Email" htmlFor="email" hint="Used to sign in. Not shown to others.">
+                  <Field label="Email" htmlFor="email" hint="Your sign-in email, managed by your account. Not shown to others.">
                     <Input id="email" value={me.email} disabled />
                   </Field>
                   <div className="sm:col-span-2">

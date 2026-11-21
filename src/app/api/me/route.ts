@@ -3,7 +3,7 @@ import { db, schema } from "@/db";
 import { updateUserInfo } from "@/lib/nexconn/server";
 import { publicProfile } from "@/lib/server/domain";
 import { handler, HttpError, json, parseBody } from "@/lib/server/http";
-import { clearSessionCookie, requireUser } from "@/lib/server/session";
+import { deleteClerkUser, requireUser } from "@/lib/server/session";
 import { profileSchema } from "@/lib/validation";
 import { z } from "zod";
 
@@ -44,8 +44,10 @@ export const PATCH = handler(async (req: Request) => {
   if (input.dailyTarget) values.dailyTarget = input.dailyTarget;
   if (input.timezone) values.timezone = input.timezone;
   if (input.autoCorrect !== undefined) values.autoCorrect = input.autoCorrect;
+  if (input.ageConfirmed && !user.ageConfirmedAt) values.ageConfirmedAt = new Date();
 
-  const complete = nativeLanguages.length > 0 && !!targetLanguage && !!(input.targetLevel ?? user.targetLevel);
+  const ageConfirmed = !!(user.ageConfirmedAt || input.ageConfirmed);
+  const complete = ageConfirmed && nativeLanguages.length > 0 && !!targetLanguage && !!(input.targetLevel ?? user.targetLevel);
   if (!user.onboardedAt && complete) values.onboardedAt = new Date();
 
   const [updated] = await db.update(schema.users).set(values).where(eq(schema.users.id, user.id)).returning();
@@ -61,6 +63,6 @@ export const DELETE = handler(async (req: Request) => {
   const user = await requireUser();
   await parseBody(req, deleteSchema);
   await db.delete(schema.users).where(eq(schema.users.id, user.id));
-  await clearSessionCookie();
+  await deleteClerkUser(user.clerkUserId);
   return json({ ok: true });
 });

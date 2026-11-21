@@ -31,6 +31,8 @@ export const profileSchema = z
     dailyTarget: z.number().int().min(5).max(120),
     timezone: z.string().max(64),
     autoCorrect: z.boolean(),
+    /** Set once during onboarding: the learner confirms they are 16 or older. */
+    ageConfirmed: z.literal(true),
   })
   .partial()
   .refine((p) => !(p.targetLanguage && p.nativeLanguages?.includes(p.targetLanguage)), {

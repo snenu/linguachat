@@ -15,8 +15,6 @@
   <a href="#run-it-locally">Run it locally</a>
 </p>
 
-![LinguaChat landing page](docs/screenshots/landing.png)
-
 ## What it is
 
 Textbooks teach you a language; people teach you how it's actually spoken. LinguaChat pairs you with a
@@ -44,16 +42,6 @@ Spanish, French, German, Portuguese, Italian, Russian, Japanese, Korean, Mandari
 | **AI tutor** | Café, job interview, travel, doctor, small talk or your own scene. Replies stream in, adapt to your level, correct you as you go, and "Help me reply" suggests phrases when you're stuck. |
 | **Practice rooms** | 12 group chats per language (3 level bands × 4 topics), a new AI-written prompt every day posted by the room host bot, members list with live presence. Rooms in your native languages appear so you can help learners. |
 | **Progress** | Daily goal ring, streaks, a 7-day chart, weekly and all-time stats, a vocabulary notebook, SM-2 flashcard review (keys 1–4), and a mistake log grouped by type with AI-found patterns ("You often …"). |
-
-| Coached chat | Partner correction card |
-| --- | --- |
-| ![Coach note under a message](docs/screenshots/chat-coach-note.png) | ![Correction card](docs/screenshots/correction-card.png) |
-| **Word lookup** | **AI tutor** |
-| ![Word lookup](docs/screenshots/word-lookup.png) | ![AI tutor](docs/screenshots/tutor.png) |
-| **Find partners** | **Progress** |
-| ![Partners](docs/screenshots/partners.png) | ![Progress](docs/screenshots/progress.png) |
-
-More in [`docs/screenshots`](docs/screenshots).
 
 ## How LinguaChat uses Nexconn
 

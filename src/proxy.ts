@@ -1,0 +1,15 @@
+import { clerkMiddleware } from "@clerk/nextjs/server";
+
+/**
+ * Clerk reads and refreshes the session on every request. Pages and API routes decide access
+ * themselves (`getSessionUser` / `requireUser`), so nothing is blocked here.
+ */
+export default clerkMiddleware();
+
+export const config = {
+  matcher: [
+    // Everything except Next.js internals and static files.
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/(api|trpc)(.*)",
+  ],
+};

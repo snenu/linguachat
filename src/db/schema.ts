@@ -23,8 +23,11 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    /** Clerk user id (`user_…`); Clerk owns sign-in, passwords and email verification. */
+    clerkUserId: text("clerk_user_id"),
     email: text("email").notNull(),
-    passwordHash: text("password_hash").notNull(),
+    /** Only set for accounts created before Clerk; unused for sign-in. */
+    passwordHash: text("password_hash"),
     displayName: text("display_name").notNull(),
     nexconnId: text("nexconn_id").notNull(),
     nexconnToken: text("nexconn_token"),
@@ -40,13 +43,15 @@ export const users = pgTable(
     dailyTarget: integer("daily_target").notNull().default(20),
     timezone: text("timezone").notNull().default("UTC"),
     autoCorrect: boolean("auto_correct").notNull().default(true),
-    ageConfirmedAt: timestamp("age_confirmed_at", { withTimezone: true }).notNull(),
+    /** When the learner confirmed they are 16+ (during onboarding). */
+    ageConfirmedAt: timestamp("age_confirmed_at", { withTimezone: true }),
     onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
     lastActiveAt: timestamp("last_active_at", { withTimezone: true }),
     createdAt: createdAt(),
   },
   (t) => [
     uniqueIndex("users_email_idx").on(t.email),
+    uniqueIndex("users_clerk_idx").on(t.clerkUserId),
     uniqueIndex("users_nexconn_idx").on(t.nexconnId),
     index("users_target_idx").on(t.targetLanguage),
   ],

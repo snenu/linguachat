@@ -1,0 +1,33 @@
+/** Clerk components themed in the airmail palette (tokens mirror src/app/globals.css). */
+export const clerkAppearance = {
+  cssLayerName: "clerk",
+  variables: {
+    colorPrimary: "#2340c8",
+    colorPrimaryForeground: "#ffffff",
+    colorForeground: "#0f1a3d",
+    colorMutedForeground: "#4a5373",
+    colorBackground: "#ffffff",
+    colorInput: "#ffffff",
+    colorInputForeground: "#0f1a3d",
+    colorBorder: "#c6ccdc",
+    colorDanger: "#c42639",
+    colorSuccess: "#138a5e",
+    colorRing: "#2340c8",
+    colorModalBackdrop: "rgba(11, 20, 51, 0.45)",
+    borderRadius: "10px",
+    fontFamily: "var(--font-atkinson), system-ui, sans-serif",
+    fontFamilyButtons: "var(--font-atkinson), system-ui, sans-serif",
+    fontSize: "15px",
+  },
+  elements: {
+    rootBox: "w-full",
+    cardBox: "w-full max-w-none rounded-none border-0 bg-transparent shadow-none",
+    card: "border-0 bg-transparent p-0 shadow-none",
+    header: "hidden",
+    footer: "bg-none bg-transparent",
+    footerAction: "hidden",
+    formButtonPrimary: "h-11 text-[0.95rem] font-semibold shadow-sm",
+    socialButtonsBlockButton: "h-11 bg-surface",
+    formFieldInput: "h-11",
+  },
+};

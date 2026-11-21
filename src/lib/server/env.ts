@@ -19,9 +19,6 @@ export const env = {
   get idPrefix() {
     return (process.env.NEXCONN_ID_PREFIX || "lgc").replace(/[^a-zA-Z0-9]/g, "");
   },
-  get sessionSecret() {
-    return required("SESSION_SECRET");
-  },
   get geminiKey() {
     return process.env.GEMINI_API_KEY || "";
   },

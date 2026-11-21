@@ -1,5 +1,9 @@
 import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
+import { config as loadEnv } from "dotenv";
+
+// Clerk keys for creating and signing in test learners.
+loadEnv({ path: path.resolve(__dirname, ".env.local"), quiet: true });
 
 /**
  * E2E against the real stack (Neon, Nexconn, Gemini). Start the app first
@@ -9,6 +13,7 @@ const fakeAudio = path.resolve(__dirname, "tests/e2e/fixtures/voice.wav");
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  globalSetup: "./tests/e2e/global-setup.ts",
   timeout: 8 * 60 * 1000,
   expect: { timeout: 45_000 },
   fullyParallel: false,

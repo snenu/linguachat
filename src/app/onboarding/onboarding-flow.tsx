@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Chip, Field, FormError, Textarea } from "@/components/ui/form";
+import { Chip, Field, FormError, Input, Textarea } from "@/components/ui/form";
 import { api, errorMessage } from "@/lib/client/api";
 import {
   DAILY_TARGETS,
@@ -25,6 +25,8 @@ const heading = "font-display text-3xl font-extrabold tracking-[-0.03em] text-in
 export function OnboardingFlow({ name }: { name: string }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [displayName, setDisplayName] = useState(name);
+  const [adult, setAdult] = useState(false);
   const [native, setNative] = useState<string[]>([]);
   const [target, setTarget] = useState<string | null>(null);
   const [agreed, setAgreed] = useState<boolean[]>(SELF_CHECK.map(() => false));
@@ -47,6 +49,8 @@ export function OnboardingFlow({ name }: { name: string }) {
   function next() {
     setError(null);
     if (step === 0) {
+      if (displayName.trim().length < 2) return setError("Add the name partners will see (at least 2 characters).");
+      if (!adult) return setError("Confirm that you are 16 or older to continue.");
       if (native.length === 0) return setError("Pick at least one language you speak natively.");
       if (!target) return setError("Pick the language you want to learn.");
       if (native.includes(target)) return setError("The language you learn can't also be a native language.");
@@ -63,6 +67,8 @@ export function OnboardingFlow({ name }: { name: string }) {
       await api("/api/me", {
         method: "PATCH",
         body: {
+          name: displayName.trim(),
+          ageConfirmed: true,
           nativeLanguages: native,
           targetLanguage: target,
           targetLevel: level ?? suggested,
@@ -108,6 +114,19 @@ export function OnboardingFlow({ name }: { name: string }) {
               Hi {name.split(" ")[0]}. Which languages do you speak?
             </h1>
             <p className="mt-2 text-ink-2">You&apos;ll help partners with your native languages while they help you with theirs.</p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <Field label="Your name" htmlFor="display-name" hint="Shown to your partners. A first name is fine.">
+                <Input id="display-name" value={displayName} maxLength={40} autoComplete="given-name" onChange={(e) => setDisplayName(e.target.value)} />
+              </Field>
+              <label
+                className={`flex cursor-pointer items-start gap-3 self-start rounded-md border p-3.5 text-sm text-ink transition-colors sm:mt-7 ${
+                  adult ? "border-accent-line bg-accent-wash" : "border-line-strong bg-surface hover:border-ink-3"
+                }`}
+              >
+                <input type="checkbox" checked={adult} onChange={(e) => setAdult(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--accent)]" />
+                <span>I am 16 years old or older. LinguaChat connects you with people you don&apos;t know, so it isn&apos;t for children.</span>
+              </label>
+            </div>
             <h2 className="mt-8 text-sm font-semibold text-ink">I speak natively (up to 3)</h2>
             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4" role="group" aria-label="Native languages">
               {LANGUAGES.map((l) => (

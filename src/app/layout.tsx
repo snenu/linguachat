@@ -1,5 +1,7 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible_Next, Bricolage_Grotesque, Literata, Noto_Sans_Devanagari } from "next/font/google";
+import { clerkAppearance } from "@/lib/clerk-appearance";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -70,7 +72,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <style>{".reveal{opacity:1!important;transform:none!important}"}</style>
         </noscript>
       </head>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <ClerkProvider
+          appearance={clerkAppearance}
+          signInUrl="/login"
+          signUpUrl="/signup"
+          signInFallbackRedirectUrl="/app"
+          signUpFallbackRedirectUrl="/onboarding"
+          afterSignOutUrl="/"
+        >
+          {children}
+        </ClerkProvider>
+      </body>
     </html>
   );
 }

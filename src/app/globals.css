@@ -1,3 +1,5 @@
+/* Clerk components sit in their own layer so Tailwind utilities can override them. */
+@layer theme, base, clerk, components, utilities;
 @import "tailwindcss";
 
 /*
