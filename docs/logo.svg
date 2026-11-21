@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <path d="M11 5H23A8 8 0 0 1 31 13V18A8 8 0 0 1 23 26H11L3 32V13A8 8 0 0 1 11 5Z" fill="#2340C8"/>
+  <path d="M25 17H37A8 8 0 0 1 45 25V44L37 38H25A8 8 0 0 1 17 30V25A8 8 0 0 1 25 17Z" fill="#F6B73C"/>
+  <clipPath id="a"><path d="M11 5H23A8 8 0 0 1 31 13V18A8 8 0 0 1 23 26H11L3 32V13A8 8 0 0 1 11 5Z"/></clipPath>
+  <path d="M25 17H37A8 8 0 0 1 45 25V44L37 38H25A8 8 0 0 1 17 30V25A8 8 0 0 1 25 17Z" fill="#0F1A3D" clip-path="url(#a)"/></svg>

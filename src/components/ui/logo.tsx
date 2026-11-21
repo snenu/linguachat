@@ -1,14 +1,8 @@
 import Link from "next/link";
 import { useId } from "react";
+import { BUBBLE_A, BUBBLE_B } from "@/lib/brand";
 
-/*
-  The mark: two speech bubbles, one for each tandem partner, overlapping where the
-  conversation happens. Blue speaks, marigold answers, the overlap is ink.
-  Paths live on a 48x48 grid; public icons are generated from the same shapes (scripts/icons.mjs).
-*/
-export const BUBBLE_A = "M11 5H23A8 8 0 0 1 31 13V18A8 8 0 0 1 23 26H11L3 32V13A8 8 0 0 1 11 5Z";
-export const BUBBLE_B = "M25 17H37A8 8 0 0 1 45 25V44L37 38H25A8 8 0 0 1 17 30V25A8 8 0 0 1 25 17Z";
-
+/** Blue speaks, marigold answers, the overlap is ink. */
 export function LogoMark({ size = 28, className = "", tile = false }: { size?: number; className?: string; tile?: boolean }) {
   const clip = useId();
   return (
