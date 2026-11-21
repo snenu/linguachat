@@ -70,5 +70,11 @@ export async function waitForChat(page: Page) {
 
 /** Deletes the learner's data and their Clerk user (the API removes both). */
 export async function deleteAccount(page: Page) {
-  await page.request.delete("/api/me", { data: { confirm: "DELETE" } }).catch(() => undefined);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    // Clerk session tokens live about a minute; a navigation lets Clerk refresh the cookie first.
+    await page.goto("/app/settings").catch(() => undefined);
+    const res = await page.request.delete("/api/me", { data: { confirm: "DELETE" } }).catch(() => null);
+    if (res?.ok()) return;
+  }
+  console.warn("[e2e] could not delete a test account; remove it manually");
 }
