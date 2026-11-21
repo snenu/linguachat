@@ -66,6 +66,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${atkinson.variable} ${bricolage.variable} ${literata.variable} ${devanagari.variable} h-full antialiased`}
     >
+      <head>
+        <noscript>
+          <style>{".reveal{opacity:1!important;transform:none!important}"}</style>
+        </noscript>
+      </head>
       <body className="min-h-full">{children}</body>
     </html>
   );
