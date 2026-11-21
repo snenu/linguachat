@@ -27,6 +27,7 @@ import { SiteHeader } from "@/components/landing/site-header";
 import { TutorDemo } from "@/components/landing/tutor-demo";
 import { ButtonLink } from "@/components/ui/button";
 import { Logo, LogoMark } from "@/components/ui/logo";
+import { BUBBLE_A, BUBBLE_B } from "@/lib/brand";
 import { LANGUAGES } from "@/lib/languages";
 import { getSessionUser } from "@/lib/server/session";
 
@@ -727,16 +728,32 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
   );
 }
 
+/** A postage stamp with perforated edges, carrying the LinguaChat mark. */
 function Stamp() {
+  const W = 132;
+  const H = 156;
+  const step = 12;
+  const holes: [number, number][] = [];
+  for (let x = step / 2; x < W; x += step) holes.push([x, 0], [x, H]);
+  for (let y = step / 2; y < H; y += step) holes.push([0, y], [W, y]);
   return (
-    <div aria-hidden="true" className="hidden shrink-0 rotate-[-7deg] md:block">
-      <div className="stamp-edge bg-accent p-2.5 shadow-md">
-        <div className="flex h-32 w-28 flex-col items-center justify-between border border-white/40 py-3 text-white">
-          <LogoMark size={52} tile={false} className="[--accent:#fff]" />
-          <span className="font-display text-sm font-bold italic">Par avion</span>
-        </div>
-      </div>
-    </div>
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" className="hidden shrink-0 rotate-[-7deg] drop-shadow-md md:block">
+      <mask id="stamp-perf">
+        <rect width={W} height={H} fill="#fff" />
+        {holes.map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r={4} fill="#000" />
+        ))}
+      </mask>
+      <rect width={W} height={H} fill="var(--accent)" mask="url(#stamp-perf)" />
+      <rect x={10} y={10} width={W - 20} height={H - 20} fill="none" stroke="#fff" strokeOpacity={0.45} />
+      <g transform="translate(30 22) scale(1.5)">
+        <path d={BUBBLE_A} fill="#fff" />
+        <path d={BUBBLE_B} fill="var(--marker)" />
+      </g>
+      <text x={W / 2} y={H - 22} textAnchor="middle" fill="#fff" fontSize="14" fontStyle="italic" fontWeight={700} fontFamily="var(--font-display)">
+        Par avion
+      </text>
+    </svg>
   );
 }
 

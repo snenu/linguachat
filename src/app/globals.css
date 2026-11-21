@@ -346,15 +346,6 @@ dialog[open]::backdrop {
   }
 }
 
-/* Postage-stamp perforations. */
-.stamp-edge {
-  --hole: 5px;
-  -webkit-mask:
-    radial-gradient(circle var(--hole) at var(--hole) var(--hole), transparent 98%, #000) calc(var(--hole) * -1) calc(var(--hole) * -1) / calc(var(--hole) * 3) calc(var(--hole) * 3);
-  mask:
-    radial-gradient(circle var(--hole) at var(--hole) var(--hole), transparent 98%, #000) calc(var(--hole) * -1) calc(var(--hole) * -1) / calc(var(--hole) * 3) calc(var(--hole) * 3);
-}
-
 /* Messages travelling along the landing page's architecture diagram. */
 @keyframes flow-y {
   from {
