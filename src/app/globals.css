@@ -288,6 +288,39 @@ h3,
   transform: none;
 }
 
+/* Landing demo: the strike is drawn across the mistake, then the fix is written in. */
+.demo-strike {
+  position: relative;
+  transition: color 300ms ease-out;
+}
+.demo-strike::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  top: 55%;
+  height: 2px;
+  background: var(--red);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 450ms var(--ease-out);
+}
+.demo-strike[data-on="true"] {
+  color: var(--ink-3);
+}
+.demo-strike[data-on="true"]::after {
+  transform: scaleX(1);
+}
+.demo-write {
+  display: inline-block;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 600ms var(--ease-out);
+}
+.demo-write[data-on="true"] {
+  clip-path: inset(0 -4px 0 0);
+}
+
 /* Modal dialog entrance. */
 dialog[open] {
   animation: pop-in 260ms var(--ease-out);
