@@ -12,6 +12,18 @@ interface Toast {
 
 const ToastContext = createContext<(message: string, tone?: Tone) => void>(() => undefined);
 
+const ICON: Record<Tone, ReactNode> = {
+  success: <Check size={14} strokeWidth={3} />,
+  info: <Info size={14} strokeWidth={2.5} />,
+  error: <X size={14} strokeWidth={3} />,
+};
+
+const DOT: Record<Tone, string> = {
+  success: "bg-mint text-white",
+  info: "bg-accent text-white",
+  error: "bg-red text-white",
+};
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const push = useCallback((message: string, tone: Tone = "success") => {
@@ -28,11 +40,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={t.id}
             role={t.tone === "error" ? "alert" : "status"}
-            className={`animate-ink-in pointer-events-auto flex max-w-md items-start gap-2.5 rounded-md border px-4 py-3 text-sm shadow-[0_2px_0_var(--line)] ${
-              t.tone === "error" ? "border-ink bg-marker-wash text-ink" : "border-line-strong bg-ink text-surface"
-            }`}
+            className="animate-pop-in pointer-events-auto flex max-w-md items-center gap-3 rounded-full bg-ink py-2.5 pr-5 pl-2.5 text-sm text-white shadow-lg"
           >
-            {t.tone === "success" ? <Check size={16} className="mt-0.5 shrink-0" /> : t.tone === "error" ? <X size={16} className="mt-0.5 shrink-0" /> : <Info size={16} className="mt-0.5 shrink-0" />}
+            <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${DOT[t.tone]}`}>{ICON[t.tone]}</span>
             <span>{t.message}</span>
           </div>
         ))}

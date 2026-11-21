@@ -32,13 +32,18 @@ export function Dialog({
         if (e.target === ref.current) onClose();
       }}
       aria-label={title}
-      className={`m-auto w-[calc(100%-2rem)] ${wide ? "max-w-2xl" : "max-w-md"} rounded-lg border border-line-strong bg-surface p-0 text-ink backdrop:bg-ink/40`}
+      className={`m-auto w-[calc(100%-2rem)] ${wide ? "max-w-2xl" : "max-w-md"} rounded-xl border border-line bg-surface p-0 text-ink shadow-lg backdrop:bg-night/45 backdrop:backdrop-blur-[2px]`}
     >
       {open && (
         <div className="flex max-h-[85vh] flex-col">
           <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
-            <h2 className="font-display text-lg font-semibold">{title}</h2>
-            <button type="button" onClick={onClose} aria-label="Close" className="rounded-md p-1.5 text-ink-2 hover:bg-wash hover:text-ink">
+            <h2 className="font-display text-lg font-bold">{title}</h2>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="rounded-md p-1.5 text-ink-2 transition-[background-color,transform] hover:bg-wash hover:text-ink active:scale-90"
+            >
               <X size={18} />
             </button>
           </div>
