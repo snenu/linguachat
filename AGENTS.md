@@ -2,7 +2,7 @@
 
 LinguaChat helps people learn a language by chatting with real native speakers (tandem exchange),
 with an AI coach beside every conversation. Built for the Nexconn Build Challenge 2026.
-Live: https://linguachat-chi.vercel.app · Repo: https://github.com/imthegoodboy/linguachat
+Live: https://linguachat-chi.vercel.app · Repo: https://github.com/snenu/linguachat
 
 This file is the working guide for anyone (human or agent) changing this repo. Keep it current.
 
@@ -86,10 +86,13 @@ the Platform Chat API.
 ## Folder map
 
 ```
-src/app/                    pages (landing, (auth), onboarding, app/*) and api/* route handlers
+src/app/                    pages (landing, (auth), onboarding, app/*), api/* route handlers, metadata
+                            files (icon.svg, favicon.ico, apple-icon.png, opengraph-image.tsx,
+                            manifest.ts, robots.ts, sitemap.ts), not-found, error, global-error
 src/app/api/                auth, me, nexconn/token, partners, requests, blocks, reports, users,
                             ai/{check,annotate,translate,word,voice}, corrections, vocab, mistakes,
                             progress, tutor/{sessions,turn,hint}, rooms/[id]/{join,leave,visit}
+src/components/landing/     hero demo (animated correction), reveal-on-scroll, tutor demo, flip card, header
 src/components/app/         providers (session user, Nexconn connection, presence, people), shell
 src/components/chat/        thread, message rendering, composer, dialogs, channel list, useThread
 src/components/partners/    partner card, profile dialog
@@ -98,19 +101,23 @@ src/db/                     Drizzle schema + client          drizzle/  SQL migra
 src/lib/nexconn/            server.ts (Platform API), client.ts (Web SDK), types.ts, model.ts
 src/lib/ai/                 gemini.ts (retry/fallback/stream), coach.ts (prompts + schemas + cache)
 src/lib/server/             env, session (JWT cookie), http, rate-limit, domain, social, tutor, rooms
-src/lib/                    languages, sm2, compat, streak, rooms, day, validation (shared)
+src/lib/                    languages, sm2, compat, streak, rooms, day, validation (shared),
+                            brand (logo paths), site (public URL)
+scripts/icons.mjs           renders favicon/app icons/README logo from src/lib/brand.ts (needs sharp)
 tests/unit/                 vitest: SM-2, compatibility, streaks, self-check, rooms, days
 tests/e2e/                  Playwright: two-context tandem journey (real Nexconn + Gemini)
 ```
 
 ## Data model (Postgres)
 - `users`: auth (bcrypt), profile, languages, CEFR level, interests, goals, daily target, timezone,
-  auto-correct preference, Nexconn id (`lgcu…`) + cached token, 16+ confirmation time.
+  auto-correct preference, Nexconn id (`lgcu…`) + cached token and the App Key it was issued for,
+  16+ confirmation time.
 - `chat_requests` (pending/accepted/declined/cancelled), `partnerships` (ordered pair), `blocks`, `reports`.
 - `vocab_items` (SM-2: ease, interval, repetitions, due_at), `review_logs`.
 - `mistakes` (category, tag, source: check/auto/partner/tutor/voice, corrected_by).
 - `activity` (per local day; drives goal, streak and weekly stats; deduped by ref).
-- `tutor_sessions`, `tutor_turns`; `rooms`, `room_members`, `room_prompts` (one per room per day).
+- `tutor_sessions`, `tutor_turns`; `rooms` (+ App Key the group was created in), `room_members`,
+  `room_prompts` (one per room per day).
 - `ai_cache` (hashed AI results), `rate_limits` (fixed windows).
 
 ## Nexconn features used (and where)
@@ -141,6 +148,12 @@ tests/e2e/                  Playwright: two-context tandem journey (real Nexconn
 All Nexconn ids are prefixed with `NEXCONN_ID_PREFIX` (`lgc`): users `lgcu<random>`, bots
 `lgcbottutor<lang>` / `lgcbotroomhost`, rooms `lgcroom<lang><band><topic>`.
 
+Switching Nexconn apps (new App Key) is safe: `api/nexconn/token` reissues a token cached for another
+App Key and restores the learner's blocklist in the new app; `lib/server/rooms.ts#ensureRoom` recreates
+a room's group and re-adds members when the group belongs to another App Key, and `joinRoom` retries once
+after re-provisioning when Nexconn answers 25410 (group does not exist). Message history stays in the old
+app.
+
 ## Environment variables (names only)
 `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `BLOB_READ_WRITE_TOKEN`, `NEXCONN_APP_KEY`,
 `NEXCONN_APP_SECRET`, `NEXCONN_API_BASE`, `NEXCONN_ID_PREFIX`, `SESSION_SECRET`, `GEMINI_API_KEY`,
@@ -166,8 +179,16 @@ vercel deploy --prod                 # remote build, region sin1
 - Server-only modules import `server-only`. Shared pure logic lives in `src/lib/*.ts` and is unit tested.
 - Gemini models come from env; every AI call goes through `lib/ai/gemini.ts` (timeouts, retries,
   fallback) and AI endpoints are rate limited per user (`rate_limits` table).
-- Design tokens in `src/app/globals.css`: paper `#F7F6F3`, ink `#17283B`, accent (plum) `#7B2D5B`,
-  marker `#F2D04B`. No gradients. Fonts: Atkinson Hyperlegible Next (UI), Literata (corrections, headings).
+- Design ("airmail") tokens in `src/app/globals.css`: paper `#F3F5FB`, surface `#FFFFFF`, ink `#0F1A3D`,
+  accent (airmail blue) `#2340C8`, red `#E23A4E` (mistakes, strikes, streak), marker (stamp marigold)
+  `#F6B73C` (saved words, unread, highlights), mint `#138A5E` (online, success). No decorative gradients:
+  the airmail stripe (`.airmail`) is used only around the landing demo and the closing invitation.
+- Fonts: Bricolage Grotesque (`font-display`, headings and numbers), Atkinson Hyperlegible Next (UI),
+  Literata (`font-pen`, corrected words and target-language words). Mistakes use `.strike`, fixes `.corrected`.
+- Motion: user-triggered changes use `animate-ink-in` / `animate-pop-in`; the landing uses `<Reveal>` and
+  one looping hero demo. Everything respects `prefers-reduced-motion`; `.reveal` has a no-JS fallback.
+- Security headers (nosniff, frame DENY, referrer policy, permissions policy with microphone=self, HSTS)
+  are set in `next.config.ts`.
 - Commits end with the Claude co-author line; PRs are squash-merged.
 
 ## Testing

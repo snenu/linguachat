@@ -45,23 +45,29 @@ export default function PartnerChatPage() {
 
   const isOnline = !!online[id];
   const header = (
-    <header className="flex items-center gap-3 border-b border-line bg-surface px-3 py-2.5 sm:px-5">
-      <Link href="/app/chats" aria-label="Back to chats" className="rounded-md p-1.5 text-ink-2 hover:bg-wash lg:hidden">
+    <header className="flex items-center gap-2 border-b border-line bg-surface px-2 py-2.5 sm:gap-3 sm:px-5">
+      <Link href="/app/chats" aria-label="Back to chats" className="rounded-full p-2 text-ink-2 transition-colors hover:bg-wash hover:text-ink lg:hidden">
         <ArrowLeft size={20} />
       </Link>
-      <button type="button" onClick={() => setProfileOpen(true)} className="flex min-w-0 flex-1 items-center gap-3 rounded-md text-left">
-        <Avatar name={partner.name} src={partner.avatarUrl} size={40} online={isOnline} />
+      <button type="button" onClick={() => setProfileOpen(true)} className="flex min-w-0 flex-1 items-center gap-3 rounded-lg py-0.5 pr-2 text-left transition-colors hover:bg-wash/70">
+        <Avatar name={partner.name} src={partner.avatarUrl} size={42} online={isOnline} />
         <span className="min-w-0">
-          <span className="block truncate font-semibold text-ink">{partner.name}</span>
-          <span className="flex flex-wrap items-center gap-1.5 text-xs text-ink-3">
-            {activeLabel(partner.lastActiveAt, isOnline)}
-            <span aria-hidden="true">·</span>
-            native {partner.nativeLanguages.map(languageName).join(", ")}, learning
-            <LangTag code={partner.targetLanguage} level={partner.targetLevel} />
+          <span className="block truncate font-display text-[1.05rem] font-bold text-ink">{partner.name}</span>
+          <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+            <span className={isOnline ? "font-semibold text-mint" : "text-ink-3"}>{activeLabel(partner.lastActiveAt, isOnline)}</span>
+            <span className="hidden items-center gap-1.5 text-ink-3 sm:inline-flex">
+              speaks <span className="font-semibold text-ink-2">{partner.nativeLanguages.map(languageName).join(", ")}</span>, learning
+              <LangTag code={partner.targetLanguage} level={partner.targetLevel} />
+            </span>
           </span>
         </span>
       </button>
-      <button type="button" onClick={() => setProfileOpen(true)} aria-label="Profile, block or report" className="rounded-md p-2 text-ink-2 hover:bg-wash">
+      <button
+        type="button"
+        onClick={() => setProfileOpen(true)}
+        aria-label="Profile, block or report"
+        className="rounded-full p-2.5 text-ink-2 transition-colors hover:bg-wash hover:text-ink"
+      >
         <MoreVertical size={18} />
       </button>
     </header>
@@ -75,12 +81,17 @@ export default function PartnerChatPage() {
         partner={{ id: partner.id, name: partner.name, nexconnId: partner.nexconnId }}
         header={header}
         empty={
-          <div className="mx-auto my-10 max-w-md rounded-lg border border-line bg-surface p-5 text-center">
-            <p className="font-display text-lg font-semibold text-ink">Start your exchange with {partner.name}</p>
-            <p className="mt-1.5 text-sm text-ink-2">
-              Try writing in {languageName(me.targetLanguage)} first. Use the check button to see a correction before you send, and help {partner.name} with{" "}
-              {languageName(partner.targetLanguage)} by tapping their message and choosing Correct.
-            </p>
+          <div className="mx-auto my-10 w-full max-w-md overflow-hidden rounded-xl border border-line bg-surface text-center shadow-sm">
+            <div className="p-6">
+              <div className="flex justify-center">
+                <Avatar name={partner.name} src={partner.avatarUrl} size={56} online={isOnline} />
+              </div>
+              <p className="mt-3 font-display text-xl font-bold text-ink">Start your exchange with {partner.name}</p>
+              <p className="mt-1.5 text-sm text-ink-2">
+                Try writing in {languageName(me.targetLanguage)} first. Use the check button to see a correction before you send, and help {partner.name} with{" "}
+                {languageName(partner.targetLanguage)} by tapping their message and choosing Correct.
+              </p>
+            </div>
           </div>
         }
       />

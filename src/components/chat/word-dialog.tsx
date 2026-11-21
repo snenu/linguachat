@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { FormError } from "@/components/ui/form";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/misc";
 import { useToast } from "@/components/ui/toast";
 import { api, ApiError, errorMessage } from "@/lib/client/api";
 import { speak } from "@/lib/client/speech";
@@ -73,40 +73,59 @@ export function WordDialog({
   return (
     <Dialog open={!!word} onClose={onClose} title="Word">
       {!info && !error && (
-        <div className="py-6">
-          <Spinner label={`Looking up "${word}"`} />
+        <div className="flex flex-col gap-3 py-2" role="status">
+          <span className="sr-only">Looking up &ldquo;{word}&rdquo;</span>
+          <p className="font-pen text-4xl font-semibold text-ink/40">{word}</p>
+          <Skeleton className="h-4 w-24 rounded-full" />
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-16 w-full rounded-lg" />
         </div>
       )}
       <FormError message={error} />
       {info && (
-        <div className="flex flex-col gap-4">
-          <div>
-            <p className="font-pen text-3xl font-semibold text-ink" lang={info.language}>
-              <span className={saved ? "marker" : ""}>{info.term || word}</span>
-            </p>
-            <p className="mt-0.5 text-sm text-ink-3">
-              {[info.partOfSpeech, info.reading].filter(Boolean).join(" · ")}
-            </p>
+        <div className="animate-ink-in flex flex-col gap-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="font-pen text-4xl leading-tight font-semibold break-words text-ink" lang={info.language}>
+                <span className={`px-0.5 ${saved ? "marker" : ""}`}>{info.term || word}</span>
+              </p>
+              {(info.partOfSpeech || info.reading) && (
+                <p className="mt-2 flex flex-wrap gap-1.5">
+                  {info.partOfSpeech && <span className="rounded-full bg-accent-wash px-2.5 py-0.5 text-xs font-semibold text-accent-ink">{info.partOfSpeech}</span>}
+                  {info.reading && (
+                    <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink-2" lang={info.language}>
+                      {info.reading}
+                    </span>
+                  )}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => speak(info.term || word || "", info.language)}
+              aria-label="Listen"
+              title="Listen"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line-strong text-ink-2 transition-[border-color,color,transform] hover:border-accent hover:text-accent active:scale-90"
+            >
+              <Volume2 size={19} />
+            </button>
           </div>
-          <p className="text-lg text-ink">{info.meaning}</p>
+          <p className="text-xl leading-snug text-ink">{info.meaning}</p>
           {info.example && (
-            <div className="rounded-md border border-line bg-paper px-3.5 py-3">
+            <div className="rounded-lg border-l-[3px] border-accent bg-paper px-4 py-3">
               <p className="text-ink" lang={info.language}>
                 {info.example}
               </p>
               {info.exampleTranslation && <p className="mt-1 text-sm text-ink-2">{info.exampleTranslation}</p>}
             </div>
           )}
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={save} loading={saving} disabled={saved} icon={saved ? <Check size={16} /> : <BookmarkPlus size={16} />}>
+          <div className="flex flex-wrap gap-2 border-t border-line pt-4">
+            <Button onClick={save} loading={saving} disabled={saved} icon={saved ? <Check size={16} /> : <BookmarkPlus size={16} />} className={saved ? "bg-mint! opacity-100!" : ""}>
               {saved ? "Saved to flashcards" : "Save to vocabulary"}
-            </Button>
-            <Button variant="secondary" icon={<Volume2 size={16} />} onClick={() => speak(info.term || word || "", info.language)}>
-              Listen
             </Button>
             {onShare && (
               <Button
-                variant="ghost"
+                variant="secondary"
                 icon={<Send size={16} />}
                 onClick={() => {
                   onShare(info);

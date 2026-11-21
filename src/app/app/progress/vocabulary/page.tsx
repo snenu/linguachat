@@ -51,6 +51,8 @@ export default function VocabularyPage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [confirm, setConfirm] = useState<VocabItem | null>(null);
+  // "Due" badges compare against the time the page opened.
+  const [now] = useState(() => Date.now());
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
@@ -92,7 +94,6 @@ export default function VocabularyPage() {
       </div>
     );
   }
-  const now = Date.now();
 
   return (
     <div className="flex flex-col gap-5">
