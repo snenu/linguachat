@@ -56,7 +56,7 @@ function WeekChart({ week, target }: { week: Progress["week"]; target: number })
       <div className="flex gap-3">
         <div className="relative h-48 w-7 shrink-0 text-right text-[0.7rem] text-ink-3 tabular-nums" aria-hidden="true">
           {ticks.map((t) => (
-            <span key={t} className="absolute right-0 -translate-y-1/2" style={{ bottom: `calc(${(t / max) * 100}% - 0.5rem)` }}>
+            <span key={t} className="absolute right-0 translate-y-1/2" style={{ bottom: `${(t / max) * 100}%` }}>
               {t}
             </span>
           ))}
@@ -273,16 +273,16 @@ export default function ProgressOverview() {
 
       <section>
         <h2 className="font-display text-xl font-bold text-ink">All time</h2>
-        <dl className="mt-3 grid grid-cols-2 overflow-hidden rounded-xl border border-line bg-surface shadow-sm md:grid-cols-4">
+        <dl className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line shadow-sm md:grid-cols-4">
           {[
             [`Messages in ${target}`, data.allTime.targetMessages, MessageSquareText],
             ["Corrections you gave", data.allTime.correctionsGiven, GraduationCap],
             ["Words saved", data.allTime.wordsSaved, BookOpenCheck],
             ["Tutor turns", data.allTime.tutorTurns, Bot],
-          ].map(([label, value, Icon], i) => {
+          ].map(([label, value, Icon]) => {
             const I = Icon as typeof Bot;
             return (
-              <div key={label as string} className={`flex flex-col gap-1 p-5 ${i > 0 ? "border-line max-md:odd:border-l-0 md:border-l" : ""} ${i > 1 ? "border-t md:border-t-0" : ""} ${i % 2 === 1 ? "border-l" : ""}`}>
+              <div key={label as string} className="flex flex-col gap-1 bg-surface p-5">
                 <dt className="flex items-center gap-1.5 text-sm text-ink-2">
                   <I size={14} className="text-ink-3" aria-hidden="true" /> {label as string}
                 </dt>

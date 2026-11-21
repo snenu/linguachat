@@ -100,7 +100,7 @@ function diffPieces(original: string, corrected: string): Piece[] | null {
   for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) dp[i][j] = a[i].t === b[j].t ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
 
   const words = (toks: Tok[]) => toks.filter((x) => /\p{L}|\p{N}/u.test(x.t)).length;
-  if (dp[0][0] === 0 || words(a.filter((_, i) => i < n)) === 0) return null;
+  if (dp[0][0] === 0 || words(a) === 0) return null;
 
   const pieces: Piece[] = [];
   let run: { lead: string; removed: string; added: string } | null = null;

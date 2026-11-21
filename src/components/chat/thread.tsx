@@ -1,9 +1,10 @@
 "use client";
 
-import { Lightbulb, MessageCircle } from "lucide-react";
+import { ArrowDown, Lightbulb, MessageCircle } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useChat, useMe, usePeople } from "@/components/app/providers";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/misc";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/components/ui/toast";
 import { api, errorMessage } from "@/lib/client/api";
@@ -68,6 +69,7 @@ export function Thread({
   const prevHeight = useRef(0);
   const prevCount = useRef(0);
   const nearBottom = useRef(true);
+  const [awayFromBottom, setAwayFromBottom] = useState(false);
 
   const senderIds = useMemo(() => [...new Set(t.messages.map((m) => m.senderId))], [t.messages]);
   const people = usePeople(senderIds);
@@ -94,7 +96,9 @@ export function Thread({
   const onScroll = () => {
     const el = scroller.current;
     if (!el) return;
-    nearBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+    const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+    nearBottom.current = distance < 120;
+    setAwayFromBottom(distance > 400);
     prevHeight.current = el.scrollHeight;
     if (el.scrollTop < 80 && t.hasMore && !t.loadingOlder) void t.loadOlder();
   };
@@ -257,84 +261,120 @@ export function Thread({
   }, [t.messages, t.readIds]);
 
   const typingName = t.typing.length ? nameOf(t.typing[0]) : null;
+
+  const jumpToLatest = () => {
+    const el = scroller.current;
+    if (!el) return;
+    nearBottom.current = true;
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  };
   const source = mode === "tutor" ? "tutor" : mode === "room" ? "room" : "chat";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {header}
-      <div ref={scroller} onScroll={onScroll} className="scroll-thin min-h-0 flex-1 overflow-y-auto px-3 py-4 sm:px-6" aria-live="polite" aria-relevant="additions">
-        <div className="mx-auto flex max-w-3xl flex-col">
-          {top}
-          {t.hasMore && (
-            <div className="flex justify-center py-2">
-              <Button size="sm" variant="ghost" loading={t.loadingOlder} onClick={() => void t.loadOlder()}>
-                Load earlier messages
-              </Button>
-            </div>
-          )}
-          {t.loading ? (
-            <div className="flex justify-center py-10 text-ink-2">
-              <Spinner label={state === "connected" ? "Loading messages" : "Connecting to chat"} />
-            </div>
-          ) : t.messages.length === 0 ? (
-            (empty ?? (
-              <div className="flex flex-col items-center gap-2 py-12 text-center text-ink-2">
-                <MessageCircle size={26} aria-hidden="true" />
-                <p>No messages yet. Say hello!</p>
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        <div ref={scroller} onScroll={onScroll} className="scroll-thin min-h-0 flex-1 overflow-y-auto px-3 pt-4 pb-6 sm:px-6" aria-live="polite" aria-relevant="additions">
+          <div className="mx-auto flex max-w-3xl flex-col">
+            {top}
+            {t.hasMore && (
+              <div className="flex justify-center py-2">
+                <Button size="sm" variant="secondary" loading={t.loadingOlder} onClick={() => void t.loadOlder()}>
+                  Load earlier messages
+                </Button>
               </div>
-            ))
-          ) : null}
-          {t.error && <p className="my-2 rounded-md bg-marker-wash px-3 py-2 text-sm text-ink">{t.error}</p>}
-          {t.messages.map((m, i) => {
-            const prev = t.messages[i - 1];
-            const newDay = !prev || new Date(prev.sentTime).toDateString() !== new Date(m.sentTime).toDateString();
-            const showSender = newDay || !prev || prev.senderId !== m.senderId || m.sentTime - prev.sentTime > 5 * 60 * 1000 || prev.type === MSG.notice;
-            const person = people.get(m.senderId);
-            return (
-              <div key={m.key}>
-                {newDay && (
-                  <div className="my-4 flex items-center gap-3 text-xs text-ink-3">
-                    <span className="h-px flex-1 bg-line" />
-                    {dayLabel(m.sentTime)}
-                    <span className="h-px flex-1 bg-line" />
-                  </div>
-                )}
-                <MessageItem
-                  m={m}
-                  text={streamsText(m, t.streams)}
-                  senderName={nameOf(m.senderId)}
-                  senderAvatar={person?.avatarUrl}
-                  showSender={showSender}
-                  isBot={mode === "tutor" ? !m.outgoing : !!person?.bot}
-                  read={m.id === lastReadOutgoing}
-                  lang={guessLang(streamsText(m, t.streams), [me.targetLanguage, ...me.nativeLanguages])}
-                  canCorrect={mode === "partner"}
-                  coachChecking={!!m.id && checkingIds.has(m.id)}
-                  actions={{
-                    onReply: (msg) => setReplyTo(msg),
-                    onWord: (w, sentence) => setWord({ word: w, sentence }),
-                    onCorrect: mode === "partner" ? (msg, text) => setCorrecting({ m: msg, text }) : undefined,
-                    onSaveCard: saveCard,
-                    onUseHint: (text) => setDraft(text),
-                    onRetry: retry,
-                    onDiscard: (msg) => t.discard(msg.key),
-                    onTranscribe: transcribe,
-                  }}
-                />
+            )}
+            {t.loading ? (
+              <div className="flex flex-col gap-4 py-6" role="status">
+                <div className="flex items-end gap-2.5">
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                  <Skeleton className="h-12 w-[55%] rounded-2xl" />
+                </div>
+                <Skeleton className="h-10 w-[40%] self-end rounded-2xl" />
+                <div className="flex items-end gap-2.5">
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                  <Skeleton className="h-16 w-[62%] rounded-2xl" />
+                </div>
+                <Skeleton className="h-10 w-[48%] self-end rounded-2xl" />
+                <p className="text-center text-xs text-ink-3">{state === "connected" ? "Loading messages" : "Connecting to chat"}</p>
               </div>
-            );
-          })}
-          {(typingName || tutorThinking) && (
-            <p className="mt-3 flex items-center gap-2 text-sm text-ink-2" role="status">
-              <span className="flex gap-0.5" aria-hidden="true">
-                <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ink-2" />
-                <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ink-2 [animation-delay:150ms]" />
-                <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ink-2 [animation-delay:300ms]" />
-              </span>
-              {tutorThinking ? `${botName ?? "Tutor"} is writing…` : `${typingName} is typing…`}
-            </p>
-          )}
+            ) : t.messages.length === 0 ? (
+              (empty ?? (
+                <div className="flex flex-col items-center gap-2 py-12 text-center text-ink-2">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-wash text-accent">
+                    <MessageCircle size={22} aria-hidden="true" />
+                  </span>
+                  <p>No messages yet. Say hello!</p>
+                </div>
+              ))
+            ) : null}
+            {t.error && <p className="my-2 rounded-lg border border-red/30 bg-red-wash px-3 py-2 text-sm text-ink">{t.error}</p>}
+            {t.messages.map((m, i) => {
+              const prev = t.messages[i - 1];
+              const next = t.messages[i + 1];
+              const newDay = !prev || new Date(prev.sentTime).toDateString() !== new Date(m.sentTime).toDateString();
+              const showSender = newDay || !prev || prev.senderId !== m.senderId || m.sentTime - prev.sentTime > 5 * 60 * 1000 || prev.type === MSG.notice;
+              const lastOfRun =
+                !next ||
+                next.senderId !== m.senderId ||
+                next.sentTime - m.sentTime > 5 * 60 * 1000 ||
+                next.type === MSG.notice ||
+                new Date(next.sentTime).toDateString() !== new Date(m.sentTime).toDateString();
+              const person = people.get(m.senderId);
+              return (
+                <div key={m.key}>
+                  {newDay && (
+                    <div className="my-5 flex justify-center">
+                      <span className="rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold text-ink-3 shadow-sm">{dayLabel(m.sentTime)}</span>
+                    </div>
+                  )}
+                  <MessageItem
+                    m={m}
+                    text={streamsText(m, t.streams)}
+                    senderName={nameOf(m.senderId)}
+                    senderAvatar={person?.avatarUrl}
+                    showSender={showSender}
+                    showMeta={lastOfRun}
+                    isBot={mode === "tutor" ? !m.outgoing : !!person?.bot}
+                    read={m.id === lastReadOutgoing}
+                    lang={guessLang(streamsText(m, t.streams), [me.targetLanguage, ...me.nativeLanguages])}
+                    canCorrect={mode === "partner"}
+                    coachChecking={!!m.id && checkingIds.has(m.id)}
+                    actions={{
+                      onReply: (msg) => setReplyTo(msg),
+                      onWord: (w, sentence) => setWord({ word: w, sentence }),
+                      onCorrect: mode === "partner" ? (msg, text) => setCorrecting({ m: msg, text }) : undefined,
+                      onSaveCard: saveCard,
+                      onUseHint: (text) => setDraft(text),
+                      onRetry: retry,
+                      onDiscard: (msg) => t.discard(msg.key),
+                      onTranscribe: transcribe,
+                    }}
+                  />
+                </div>
+              );
+            })}
+            {(typingName || tutorThinking) && (
+              <div className="animate-ink-in mt-4 flex items-center gap-2.5" role="status">
+                <span className="flex h-9 items-center gap-1 rounded-2xl rounded-tl-md border border-line bg-surface px-3.5 shadow-sm" aria-hidden="true">
+                  <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ink-3" />
+                  <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ink-3 [animation-delay:150ms]" />
+                  <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ink-3 [animation-delay:300ms]" />
+                </span>
+                <span className="text-sm text-ink-2">{tutorThinking ? `${botName ?? "Tutor"} is writing…` : `${typingName} is typing…`}</span>
+              </div>
+            )}
+          </div>
         </div>
+        {awayFromBottom && (
+          <button
+            type="button"
+            onClick={jumpToLatest}
+            className="animate-pop-in absolute right-4 bottom-4 flex h-10 items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-sm font-semibold text-ink shadow-md transition-colors hover:border-accent hover:text-accent-ink sm:right-6"
+          >
+            <ArrowDown size={15} aria-hidden="true" /> Latest
+          </button>
+        )}
       </div>
       <Composer
         draft={draft}
