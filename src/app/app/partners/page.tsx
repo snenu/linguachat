@@ -27,7 +27,7 @@ export default function PartnersPage() {
 
 function GridSkeleton() {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
+    <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3" aria-hidden="true">
       {Array.from({ length: 6 }, (_, i) => (
         <div key={i} className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-4">
           <div className="flex items-center gap-3">
@@ -230,7 +230,7 @@ function Discover() {
               </p>
               <p className="text-xs text-ink-3">Ranked by tandem fit, shared interests, level balance and who&apos;s online.</p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
               {list.map((c) => (
                 <PartnerCard key={c.profile.id} candidate={c} online={!!online[c.profile.nexconnId]} onOpen={() => setOpen(c)} />
               ))}

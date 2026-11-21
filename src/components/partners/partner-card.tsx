@@ -75,7 +75,7 @@ export function PartnerCard({ candidate, online, onOpen }: { candidate: Candidat
       <div className="flex items-start gap-3">
         <Avatar name={p.name} src={p.avatarUrl} size={52} online={online} />
         <div className="min-w-0 flex-1 pt-0.5">
-          <p className="truncate font-bold text-ink group-hover:text-accent-ink">{p.name}</p>
+          <p className="line-clamp-2 font-bold break-words text-ink group-hover:text-accent-ink">{p.name}</p>
           <p className={`text-xs ${online ? "font-semibold text-mint" : "text-ink-3"}`}>{activeLabel(p.lastActiveAt, online)}</p>
           {relation && <span className={`mt-1.5 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${relation.className}`}>{relation.label}</span>}
         </div>
