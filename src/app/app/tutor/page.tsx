@@ -167,7 +167,7 @@ export default function TutorPage() {
   return (
     <div className="flex h-[calc(100dvh-3.5rem-4rem)] min-h-0 lg:h-screen">
       <aside className="scroll-thin hidden w-80 shrink-0 overflow-y-auto border-r border-line bg-paper p-4 lg:block">
-        <h1 className="font-serif text-xl font-semibold text-ink">AI tutor</h1>
+        <h1 className="font-display text-xl font-semibold text-ink">AI tutor</h1>
         <p className="mt-1 mb-5 text-sm text-ink-2">Real conversations, no pressure. Corrections appear under your messages.</p>
         {sidebar}
       </aside>
@@ -184,7 +184,7 @@ export default function TutorPage() {
           empty={
             <div className="mx-auto my-8 max-w-md rounded-lg border border-line bg-surface p-5">
               <GraduationCap size={24} className="text-accent" aria-hidden="true" />
-              <p className="mt-2 font-serif text-lg font-semibold text-ink">Practise {target} with your AI tutor</p>
+              <p className="mt-2 font-display text-lg font-semibold text-ink">Practise {target} with your AI tutor</p>
               <p className="mt-1 text-sm text-ink-2">
                 Choose a scene. The tutor opens the conversation, replies at your level and corrects you quietly. Stuck? Tap Help me reply.
               </p>

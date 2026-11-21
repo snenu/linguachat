@@ -117,7 +117,7 @@ export default function RoomPage() {
         <>
           {header}
           <div className="mx-auto w-full max-w-xl px-4 py-10">
-            <h2 className="font-serif text-2xl font-semibold text-ink">{data.room.name}</h2>
+            <h2 className="font-display text-2xl font-semibold text-ink">{data.room.name}</h2>
             <p className="mt-2 text-ink-2">
               Practise {data.room.topicName.toLowerCase()} with other learners at {data.room.bandLabel}. Each day the room host posts a new conversation
               prompt. Your messages get the same quiet coach notes as in your chats.
@@ -139,7 +139,7 @@ export default function RoomPage() {
                 <p className="flex items-center gap-2 text-xs font-semibold text-ink-2">
                   <Lightbulb size={14} aria-hidden="true" /> Today&apos;s prompt
                 </p>
-                <p className="mt-1.5 font-serif text-lg text-ink" lang={data.room.language}>
+                <p className="mt-1.5 font-pen text-lg text-ink" lang={data.room.language}>
                   {prompt.prompt}
                 </p>
                 {prompt.hint && (

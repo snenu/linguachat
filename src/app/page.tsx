@@ -37,7 +37,7 @@ export default async function Landing() {
       <main>
         <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-10 pb-20 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:pt-20">
           <div>
-            <h1 className="font-serif text-4xl font-semibold tracking-tight text-ink sm:text-[3.6rem] sm:leading-[1.05]">
+            <h1 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-[3.6rem] sm:leading-[1.05]">
               Every conversation is a lesson.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-ink-2">
@@ -83,7 +83,7 @@ export default async function Landing() {
 
         <section className="border-y border-line bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-            <h2 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">How it works</h2>
+            <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">How it works</h2>
             <ol className="mt-8 grid gap-8 md:grid-cols-3">
               {[
                 ["Tell us your languages", "Pick what you speak, what you're learning and your level. A short self-check helps you choose."],
@@ -91,7 +91,7 @@ export default async function Landing() {
                 ["Chat, get coached, review", "Talk in real time. Corrections, translations and flashcards come from every conversation."],
               ].map(([title, body], i) => (
                 <li key={title} className="flex gap-4">
-                  <span className="font-serif text-3xl font-semibold text-accent">{i + 1}</span>
+                  <span className="font-display text-3xl font-semibold text-accent">{i + 1}</span>
                   <div>
                     <h3 className="font-semibold text-ink">{title}</h3>
                     <p className="mt-1 text-ink-2">{body}</p>
@@ -103,7 +103,7 @@ export default async function Landing() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <h2 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">What the coach does</h2>
+          <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">What the coach does</h2>
           <div className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
             {coach.map(({ icon: Icon, title, body }) => (
               <div key={title} className="flex gap-3.5">
@@ -126,8 +126,8 @@ export default async function Landing() {
 
         <section className="border-t border-line">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-            <h2 className="font-serif text-xl font-semibold text-ink">Twelve languages, every direction</h2>
-            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-3 font-serif text-xl text-ink" lang="mul">
+            <h2 className="font-display text-xl font-semibold text-ink">Twelve languages, every direction</h2>
+            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-3 font-display text-xl text-ink" lang="mul">
               {LANGUAGES.map((l) => (
                 <li key={l.code} lang={l.code} dir={l.rtl ? "rtl" : undefined} title={l.name}>
                   {l.native}

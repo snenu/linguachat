@@ -229,7 +229,7 @@ function Requests({ data, refresh }: { data?: { incoming: RequestItem[]; outgoin
   return (
     <div className="flex flex-col gap-8">
       <section>
-        <h2 className="font-serif text-xl font-semibold text-ink">Waiting for you</h2>
+        <h2 className="font-display text-xl font-semibold text-ink">Waiting for you</h2>
         {data.incoming.length === 0 ? (
           <p className="mt-2 text-ink-2">No requests right now. When someone asks to chat, it appears here instantly.</p>
         ) : (
@@ -237,7 +237,7 @@ function Requests({ data, refresh }: { data?: { incoming: RequestItem[]; outgoin
         )}
       </section>
       <section>
-        <h2 className="font-serif text-xl font-semibold text-ink">Sent by you</h2>
+        <h2 className="font-display text-xl font-semibold text-ink">Sent by you</h2>
         {data.outgoing.length === 0 ? (
           <p className="mt-2 text-ink-2">You haven&apos;t sent any requests that are still waiting.</p>
         ) : (

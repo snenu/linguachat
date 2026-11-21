@@ -131,7 +131,7 @@ export default function SettingsPage() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="font-serif text-xl font-semibold text-ink">Languages</h2>
+          <h2 className="font-display text-xl font-semibold text-ink">Languages</h2>
           <div>
             <p className="text-sm font-semibold text-ink">Native (up to 3)</p>
             <div className="mt-2 flex flex-wrap gap-2">
@@ -165,7 +165,7 @@ export default function SettingsPage() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="font-serif text-xl font-semibold text-ink">Interests and goals</h2>
+          <h2 className="font-display text-xl font-semibold text-ink">Interests and goals</h2>
           <div className="flex flex-wrap gap-2">
             {INTERESTS.map((i) => (
               <Chip key={i} selected={interests.includes(i)} onToggle={() => toggle(interests, setInterests, i, 10)}>
@@ -183,7 +183,7 @@ export default function SettingsPage() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="font-serif text-xl font-semibold text-ink">Practice and coaching</h2>
+          <h2 className="font-display text-xl font-semibold text-ink">Practice and coaching</h2>
           <Field label="Daily goal" htmlFor="daily">
             <Select id="daily" value={daily} onChange={(e) => setDaily(Number(e.target.value))}>
               {DAILY_TARGETS.map((t) => (
@@ -214,7 +214,7 @@ export default function SettingsPage() {
       </form>
 
       <section className="mt-12 border-t border-line pt-8">
-        <h2 className="font-serif text-xl font-semibold text-ink">Blocked people</h2>
+        <h2 className="font-display text-xl font-semibold text-ink">Blocked people</h2>
         {!blocked || blocked.blocked.length === 0 ? (
           <p className="mt-2 text-sm text-ink-2">You haven&apos;t blocked anyone.</p>
         ) : (
@@ -233,7 +233,7 @@ export default function SettingsPage() {
       </section>
 
       <section className="mt-12 border-t border-line pt-8">
-        <h2 className="font-serif text-xl font-semibold text-ink">Delete account</h2>
+        <h2 className="font-display text-xl font-semibold text-ink">Delete account</h2>
         <p className="mt-1 text-sm text-ink-2">Removes your profile, vocabulary, mistake log and partnerships from LinguaChat.</p>
         <Button variant="secondary" className="mt-3" onClick={() => setDeleteOpen(true)}>
           Delete my account

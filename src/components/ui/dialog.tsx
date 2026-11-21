@@ -37,7 +37,7 @@ export function Dialog({
       {open && (
         <div className="flex max-h-[85vh] flex-col">
           <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
-            <h2 className="font-serif text-lg font-semibold">{title}</h2>
+            <h2 className="font-display text-lg font-semibold">{title}</h2>
             <button type="button" onClick={onClose} aria-label="Close" className="rounded-md p-1.5 text-ink-2 hover:bg-wash hover:text-ink">
               <X size={18} />
             </button>

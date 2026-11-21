@@ -52,7 +52,7 @@ export default function RoomsPage() {
       />
       {bands.map((b) => (
         <section key={b.id} className="mt-8">
-          <h2 className="font-serif text-xl font-semibold text-ink">
+          <h2 className="font-display text-xl font-semibold text-ink">
             {languageName(me.targetLanguage)} {b.label}
             <span className="ml-2 text-base font-normal text-ink-3">
               {b.name}
@@ -68,7 +68,7 @@ export default function RoomsPage() {
       ))}
       {helpLangs.map((lang) => (
         <section key={lang} className="mt-12 border-t border-line pt-8">
-          <h2 className="font-serif text-xl font-semibold text-ink">Help {languageName(lang)} learners</h2>
+          <h2 className="font-display text-xl font-semibold text-ink">Help {languageName(lang)} learners</h2>
           <p className="mt-1 text-sm text-ink-2">You&apos;re a native speaker. Join a room to answer questions and keep conversations going.</p>
           <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {data.helping.filter((r) => r.language === lang && r.band === "a").map((r) => (

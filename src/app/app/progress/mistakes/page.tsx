@@ -33,7 +33,7 @@ function Patterns() {
   });
   return (
     <section className="rounded-lg border border-line bg-surface p-5">
-      <h2 className="flex items-center gap-2 font-serif text-lg font-semibold text-ink">
+      <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-ink">
         <Sparkles size={18} className="text-accent" aria-hidden="true" /> Patterns the coach noticed
       </h2>
       {isLoading ? (
@@ -124,7 +124,7 @@ export default function MistakesPage() {
         <Patterns />
         {data.topTags.length > 0 && (
           <section className="rounded-lg border border-line bg-surface p-5">
-            <h2 className="font-serif text-lg font-semibold text-ink">Most frequent</h2>
+            <h2 className="font-display text-lg font-semibold text-ink">Most frequent</h2>
             <ul className="mt-2 flex flex-col gap-1.5 text-sm">
               {data.topTags.map((t) => (
                 <li key={t.tag} className="flex justify-between gap-2">

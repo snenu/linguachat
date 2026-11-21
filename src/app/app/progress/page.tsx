@@ -47,7 +47,7 @@ function Stat({ label, value, href }: { label: string; value: number; href?: str
   const inner = (
     <>
       <p className="text-sm text-ink-2">{label}</p>
-      <p className="mt-1 font-serif text-3xl font-semibold text-ink tabular-nums">{value}</p>
+      <p className="mt-1 font-display text-3xl font-semibold text-ink tabular-nums">{value}</p>
     </>
   );
   return href ? (
@@ -69,7 +69,7 @@ export default function ProgressOverview() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="p-5">
           <p className="text-sm text-ink-2">Current streak</p>
-          <p className="mt-1 flex items-center gap-2 font-serif text-4xl font-semibold text-ink">
+          <p className="mt-1 flex items-center gap-2 font-display text-4xl font-semibold text-ink">
             <Flame size={28} fill={data.streak ? "var(--marker)" : "none"} aria-hidden="true" />
             {data.streak} {data.streak === 1 ? "day" : "days"}
           </p>
@@ -83,7 +83,7 @@ export default function ProgressOverview() {
         </Card>
       </div>
       <section>
-        <h2 className="font-serif text-xl font-semibold text-ink">Last 7 days</h2>
+        <h2 className="font-display text-xl font-semibold text-ink">Last 7 days</h2>
         <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
           <Stat label={`Messages in ${target}`} value={data.weekTotals.targetMessages} />
           <Stat label="Corrections received" value={data.weekTotals.correctionsReceived} href="/app/progress/mistakes" />
@@ -94,7 +94,7 @@ export default function ProgressOverview() {
         </div>
       </section>
       <section>
-        <h2 className="font-serif text-xl font-semibold text-ink">All time</h2>
+        <h2 className="font-display text-xl font-semibold text-ink">All time</h2>
         <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
           <Stat label={`Messages in ${target}`} value={data.allTime.targetMessages} />
           <Stat label="Corrections you gave" value={data.allTime.correctionsGiven} />

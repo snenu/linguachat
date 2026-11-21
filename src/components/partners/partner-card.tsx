@@ -44,7 +44,7 @@ export function PartnerCard({ candidate, online, onOpen }: { candidate: Candidat
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
             <span className="truncate font-semibold text-ink">{p.name}</span>
-            <span className="shrink-0 font-serif text-lg font-semibold text-ink" title="Compatibility">
+            <span className="shrink-0 font-display text-lg font-semibold text-ink" title="Compatibility">
               {score}
               <span className="text-sm text-ink-3">%</span>
             </span>

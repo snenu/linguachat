@@ -95,7 +95,7 @@ export default function ReviewPage() {
       <div className="flex min-h-72 flex-col justify-between rounded-lg border border-line-strong bg-surface p-6 sm:p-8" aria-live="polite">
         <div>
           <div className="flex items-start justify-between gap-3">
-            <p className="font-serif text-4xl font-semibold text-ink" lang={card.language}>
+            <p className="font-pen text-4xl font-semibold text-ink" lang={card.language}>
               {card.term}
             </p>
             <button type="button" onClick={() => speak(card.term, card.language)} aria-label="Listen" className="rounded-md p-2 text-ink-2 hover:bg-wash">

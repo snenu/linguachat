@@ -37,7 +37,7 @@ export function SignupForm() {
 
   return (
     <div className="w-full max-w-md">
-      <h1 className="font-serif text-3xl font-semibold text-ink">Create your account</h1>
+      <h1 className="font-display text-3xl font-semibold text-ink">Create your account</h1>
       <p className="mt-2 text-ink-2">Two minutes to set up, then you can start chatting.</p>
       <form onSubmit={submit} className="mt-8 flex flex-col gap-5" noValidate>
         <FormError message={error} />

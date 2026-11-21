@@ -149,7 +149,7 @@ export function MessageItem({
         <p className="flex items-center gap-2 text-xs font-semibold text-ink-2">
           <Lightbulb size={14} aria-hidden="true" /> Today&apos;s conversation prompt
         </p>
-        <p className="mt-2 font-serif text-lg text-ink" lang={c.language}>
+        <p className="mt-2 font-pen text-lg text-ink" lang={c.language}>
           {c.prompt}
         </p>
         {c.hint && (
@@ -172,7 +172,7 @@ export function MessageItem({
         <p className="flex items-center gap-2 text-xs font-semibold text-ink-2">
           <Lightbulb size={14} aria-hidden="true" /> {c.kind === "scene" ? "New scene" : "Tutor tip"}
         </p>
-        <p className="mt-1.5 font-serif text-lg font-semibold text-ink">{c.title}</p>
+        <p className="mt-1.5 font-display text-lg font-semibold text-ink">{c.title}</p>
         {c.kind === "scene" ? (
           <>
             <p className="mt-1 text-ink">{c.items[0]}</p>
@@ -252,7 +252,7 @@ export function MessageItem({
     body = (
       <div className="rounded-lg border border-line-strong bg-surface px-4 py-3">
         <p className="text-xs font-semibold text-ink-2">{out ? "You shared a word" : `${senderName} shared a word`}</p>
-        <p className="mt-1 font-serif text-xl font-semibold text-ink" lang={c.language}>
+        <p className="mt-1 font-pen text-xl font-semibold text-ink" lang={c.language}>
           <span className="marker">{c.term}</span> {c.reading && <span className="text-sm font-normal text-ink-3">{c.reading}</span>}
         </p>
         <p className="text-ink">{c.meaning}</p>

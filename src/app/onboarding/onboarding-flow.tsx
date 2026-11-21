@@ -95,7 +95,7 @@ export function OnboardingFlow({ name }: { name: string }) {
       <div className="pt-8">
         {step === 0 && (
           <section aria-labelledby="s0">
-            <h1 id="s0" className="font-serif text-3xl font-semibold text-ink">
+            <h1 id="s0" className="font-display text-3xl font-semibold text-ink">
               Hi {name.split(" ")[0]}. Which languages do you speak?
             </h1>
             <p className="mt-2 text-ink-2">You&apos;ll help partners with your native languages while they help you.</p>
@@ -120,7 +120,7 @@ export function OnboardingFlow({ name }: { name: string }) {
 
         {step === 1 && (
           <section aria-labelledby="s1">
-            <h1 id="s1" className="font-serif text-3xl font-semibold text-ink">How much {targetName} do you know?</h1>
+            <h1 id="s1" className="font-display text-3xl font-semibold text-ink">How much {targetName} do you know?</h1>
             <p className="mt-2 text-ink-2">Tick every statement that is true for you in {targetName}. We&apos;ll suggest a CEFR level.</p>
             <ul className="mt-6 flex flex-col gap-2">
               {SELF_CHECK.map((item, i) => (
@@ -159,7 +159,7 @@ export function OnboardingFlow({ name }: { name: string }) {
 
         {step === 2 && (
           <section aria-labelledby="s2">
-            <h1 id="s2" className="font-serif text-3xl font-semibold text-ink">What do you like to talk about?</h1>
+            <h1 id="s2" className="font-display text-3xl font-semibold text-ink">What do you like to talk about?</h1>
             <p className="mt-2 text-ink-2">Shared interests make conversations easier. Pick up to 10.</p>
             <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label="Interests">
               {INTERESTS.map((i) => (
@@ -181,7 +181,7 @@ export function OnboardingFlow({ name }: { name: string }) {
 
         {step === 3 && (
           <section aria-labelledby="s3">
-            <h1 id="s3" className="font-serif text-3xl font-semibold text-ink">Set a daily practice goal</h1>
+            <h1 id="s3" className="font-display text-3xl font-semibold text-ink">Set a daily practice goal</h1>
             <p className="mt-2 text-ink-2">
               Each message you write in {targetName}, each tutor reply and each flashcard counts as one practice point.
             </p>
@@ -201,7 +201,7 @@ export function OnboardingFlow({ name }: { name: string }) {
                     <span className="block font-semibold text-ink">{t.label}</span>
                     <span className="text-sm text-ink-2">{t.hint}</span>
                   </span>
-                  <span className="font-serif text-2xl font-semibold text-ink">{t.value}</span>
+                  <span className="font-display text-2xl font-semibold text-ink">{t.value}</span>
                 </button>
               ))}
             </div>

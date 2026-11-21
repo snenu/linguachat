@@ -81,7 +81,7 @@ export function WordDialog({
       {info && (
         <div className="flex flex-col gap-4">
           <div>
-            <p className="font-serif text-3xl font-semibold text-ink" lang={info.language}>
+            <p className="font-pen text-3xl font-semibold text-ink" lang={info.language}>
               <span className={saved ? "marker" : ""}>{info.term || word}</span>
             </p>
             <p className="mt-0.5 text-sm text-ink-3">

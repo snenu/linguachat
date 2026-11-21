@@ -67,7 +67,7 @@ export function ProfileDialog({
           <div className="flex items-start gap-4">
             <Avatar name={p.name} src={p.avatarUrl} size={64} online={online} />
             <div className="min-w-0">
-              <p className="font-serif text-2xl font-semibold text-ink">{scoreWithPresence(candidate, online)}% match</p>
+              <p className="font-display text-2xl font-semibold text-ink">{scoreWithPresence(candidate, online)}% match</p>
               <p className="text-sm text-ink-3">{activeLabel(p.lastActiveAt, online)}</p>
               <div className="mt-2 flex flex-wrap items-center gap-1.5 text-sm text-ink-2">
                 Speaks {p.nativeLanguages.map((l) => <LangTag key={l} code={l} />)} and is learning <LangTag code={p.targetLanguage} level={p.targetLevel} />

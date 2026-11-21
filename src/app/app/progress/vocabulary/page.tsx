@@ -102,7 +102,7 @@ export default function VocabularyPage() {
             <li key={v.id} className="flex items-start gap-3 px-4 py-3.5">
               <div className="min-w-0 flex-1">
                 <p className="flex flex-wrap items-baseline gap-x-2">
-                  <span className="font-serif text-lg font-semibold text-ink" lang={v.language}>
+                  <span className="font-pen text-lg font-semibold text-ink" lang={v.language}>
                     {v.term}
                   </span>
                   {v.reading && <span className="text-sm text-ink-3">{v.reading}</span>}

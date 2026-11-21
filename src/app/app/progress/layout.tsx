@@ -14,7 +14,7 @@ export default function ProgressLayout({ children }: { children: React.ReactNode
   const pathname = usePathname();
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:py-10">
-      <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Progress</h1>
+      <h1 className="font-display text-2xl font-semibold text-ink sm:text-3xl">Progress</h1>
       <nav aria-label="Progress sections" className="scroll-thin mt-4 flex gap-1 overflow-x-auto border-b border-line">
         {TABS.map((t) => {
           const active = pathname === t.href;

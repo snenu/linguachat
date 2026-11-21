@@ -30,7 +30,7 @@ export function LoginForm() {
 
   return (
     <div className="w-full max-w-md">
-      <h1 className="font-serif text-3xl font-semibold text-ink">Welcome back</h1>
+      <h1 className="font-display text-3xl font-semibold text-ink">Welcome back</h1>
       <p className="mt-2 text-ink-2">Sign in to continue your conversations.</p>
       <form onSubmit={submit} className="mt-8 flex flex-col gap-5" noValidate>
         <FormError message={error} />

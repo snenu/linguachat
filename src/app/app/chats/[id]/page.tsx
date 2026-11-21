@@ -76,7 +76,7 @@ export default function PartnerChatPage() {
         header={header}
         empty={
           <div className="mx-auto my-10 max-w-md rounded-lg border border-line bg-surface p-5 text-center">
-            <p className="font-serif text-lg font-semibold text-ink">Start your exchange with {partner.name}</p>
+            <p className="font-display text-lg font-semibold text-ink">Start your exchange with {partner.name}</p>
             <p className="mt-1.5 text-sm text-ink-2">
               Try writing in {languageName(me.targetLanguage)} first. Use the check button to see a correction before you send, and help {partner.name} with{" "}
               {languageName(partner.targetLanguage)} by tapping their message and choosing Correct.
